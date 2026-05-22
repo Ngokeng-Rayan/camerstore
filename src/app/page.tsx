@@ -10,7 +10,7 @@ import { FrontFooter } from "@/components/FrontFooter";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  let featuredProducts = [];
+  let featuredProducts: any[] = [];
   try {
     featuredProducts = await prisma.product.findMany({
       orderBy: { createdAt: 'desc' },
