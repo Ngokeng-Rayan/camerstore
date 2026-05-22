@@ -53,6 +53,7 @@ jobs:
           # Renommer le server natif et utiliser notre server.js compatible Passenger
           mv .next/standalone/server.js .next/standalone/server.js.bak
           cp server.js .next/standalone/server.js
+          cp hello.js .next/standalone/hello.js
 
           # Copier package.json
           cp package.json .next/standalone/package.json
