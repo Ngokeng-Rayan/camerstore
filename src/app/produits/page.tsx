@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Package, Star } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductsPage({
   searchParams,
 }: {
