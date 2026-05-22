@@ -8,14 +8,11 @@ let nextHandler = null;
 try {
     const next = require('next');
 
-    // Inject the standalone config if it exists
-    const standaloneServerPath = path.join(__dirname, 'server.js.bak');
-    if (fs.existsSync(standaloneServerPath)) {
-        const content = fs.readFileSync(standaloneServerPath, 'utf8');
-        const match = content.match(/process\.env\.__NEXT_PRIVATE_STANDALONE_CONFIG = ('.*?'|".*?"|JSON\.stringify\(.*?\))/);
-        if (match) {
-            eval('process.env.__NEXT_PRIVATE_STANDALONE_CONFIG = ' + match[1]);
-        }
+    // Inject the standalone config by reading required-server-files.json
+    const requiredServerFilesPath = path.join(__dirname, '.next', 'required-server-files.json');
+    if (fs.existsSync(requiredServerFilesPath)) {
+        const requiredServerFiles = JSON.parse(fs.readFileSync(requiredServerFilesPath, 'utf8'));
+        process.env.__NEXT_PRIVATE_STANDALONE_CONFIG = JSON.stringify(requiredServerFiles.config);
     }
 
     const dev = process.env.NODE_ENV !== 'production';
