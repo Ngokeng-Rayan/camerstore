@@ -3,6 +3,8 @@ import ProductClient from "./ProductClient";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
+export const revalidate = 60;
+
 // SEO + Open Graph dynamique pour chaque produit
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;

@@ -7,7 +7,7 @@ import prisma from "@/lib/prisma";
 import { FrontNavbar } from "@/components/FrontNavbar";
 import { FrontFooter } from "@/components/FrontFooter";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function HomePage() {
   const featuredProducts = await prisma.product.findMany({
