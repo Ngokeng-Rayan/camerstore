@@ -10,11 +10,16 @@ import { FrontFooter } from "@/components/FrontFooter";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const featuredProducts = await prisma.product.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 8,
-    include: { reviews: true }
-  });
+  let featuredProducts = [];
+  try {
+    featuredProducts = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+      include: { reviews: true }
+    });
+  } catch (error) {
+    console.warn("⚠️ Impossible de charger les produits (généralement ignoré pendant le build de Next.js)");
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
