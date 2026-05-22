@@ -1,0 +1,71 @@
+name: Build & Deploy to o2switch (FTP)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer le code source
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Installer Node.js 20
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # 3. Installer les dépendances
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Générer le client Prisma (ne nécessite PAS de base de données)
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      # 5. Compiler Next.js en mode standalone
+      #    Les variables NEXT_PUBLIC_* sont intégrées dans le JS client pendant le build.
+      #    DATABASE_URL n'est PAS nécessaire ici car le sitemap est dynamique.
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_URL: https://camerstore.cdwfs.net
+          NEXT_PUBLIC_FB_PIXEL_ID: "970853945792142"
+
+      # 6. Préparer le dossier de déploiement
+      #    Le mode standalone produit un serveur autonome dans .next/standalone/
+      #    mais il faut y copier les assets statiques et le dossier public manuellement.
+      - name: Prepare deployment folder
+        run: |
+          # Copier les fichiers statiques dans le build standalone
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+
+          # Copier le schéma Prisma (pour que l'utilisateur puisse faire db push sur o2switch)
+          cp -r prisma .next/standalone/prisma
+
+          # Copier server.js (point d'entrée Passenger) et package.json
+          cp server.js .next/standalone/server.js
+          cp package.json .next/standalone/package.json
+          cp package-lock.json .next/standalone/package-lock.json
+
+          # Créer le fichier restart.txt pour que Passenger redémarre l'app
+          mkdir -p .next/standalone/tmp
+          touch .next/standalone/tmp/restart.txt
+
+      # 7. Déployer via FTP vers o2switch
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: .next/standalone/
+          server-dir: /
+          dangerous-clean-slate: false

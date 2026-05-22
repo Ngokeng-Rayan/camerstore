@@ -1,0 +1,91 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-1.0.x", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("CLOSER") // "ADMIN" ou "CLOSER"
+  password  String   // Hashed password
+  isActive  Boolean  @default(true) // Permet de désactiver un compte sans le supprimer
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]  // Relation : Les commandes gérées par ce closer
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  products  Product[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  description String
+  images      String[] // URLs des images
+  descriptionMedia String[] // GIFs/Images pour la description
+  costPrice   Float    // Prix d'achat chez le fournisseur chinois
+  sellingPrice Float   // Prix de vente
+  comparePrice Float?  // Prix barré
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+  reviews     Review[]
+}
+
+model Order {
+  id             String   @id @default(uuid())
+  customerName   String
+  customerPhone  String
+  customerCity   String
+  customerAddress String?
+  quantity       Int      @default(1)
+  status         String   @default("NEW_LEAD") // NEW_LEAD, REFUSED_CALL, CONFIRMED, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
+  totalPrice     Float
+  
+  // Infos de livraison planifiée
+  deliveryDate     DateTime?
+  deliveryTimeSlot String? // Ex: "Matin (8h-12h)"
+  deliveryNotes    String? // Ex: "Appeler 30min avant"
+  
+  // Tracking Meta Ads (CAPI) — sauvegardé à la création pour envoi à la confirmation
+  clientIp  String? // IP du client au moment de la commande
+  userAgent String? // User-Agent du navigateur
+  fbp       String? // Cookie _fbp (Facebook Pixel Browser ID)
+  fbc       String? // Cookie _fbc (Facebook Click ID, dérivé de fbclid)
+  eventId   String? // UUID pour la déduplication Pixel ↔ CAPI
+  
+  // Relations
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id])
+  
+  closerId       String?
+  closer         User?    @relation(fields: [closerId], references: [id])
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  customerName String
+  content     String
+  rating      Int      @default(5)
+  images      String[] // Photos de l'avis
+  
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+}
