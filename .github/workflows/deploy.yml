@@ -50,6 +50,9 @@ jobs:
           # Copier le schéma Prisma (pour que l'utilisateur puisse faire db push sur o2switch)
           cp -r prisma .next/standalone/prisma
 
+          # Utiliser notre server.js de débogage personnalisé au lieu de celui de Next.js
+          cp server.js .next/standalone/server.js
+
           # Copier package.json
           cp package.json .next/standalone/package.json
           cp package-lock.json .next/standalone/package-lock.json
