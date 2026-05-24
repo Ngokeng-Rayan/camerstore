@@ -401,7 +401,16 @@ export default function ProductClient({ product, reviews }: { product: any, revi
       {/* Sticky Bottom Button */}
       <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-slate-200 z-50 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] flex justify-center md:hidden">
         <button 
-          onClick={() => document.getElementById('order-form')?.scrollIntoView({ behavior: 'smooth' })}
+          onClick={() => {
+            fbEvent("AddToCart", {
+              content_ids: [product.id],
+              content_name: product.title,
+              content_type: "product",
+              value: product.sellingPrice,
+              currency: "XAF"
+            });
+            document.getElementById('order-form')?.scrollIntoView({ behavior: 'smooth' });
+          }}
           className="w-full max-w-xl bg-brand-green hover:bg-lime-500 text-brand-navy font-extrabold text-lg py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg animate-heartbeat"
         >
           <ShoppingBag size={24} />
