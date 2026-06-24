@@ -244,7 +244,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
         <div className="bg-slate-100 aspect-[4/3] md:aspect-video w-full relative flex items-center justify-center overflow-hidden">
           {product.images && product.images.length > 0 ? (
             <>
-              <Image src={product.images[currentImageIndex]} alt={product.title} fill className="object-contain" />
+              <Image src={product.images[currentImageIndex]} alt={product.title} fill className="object-cover" />
               
               {/* Flèches de navigation si plus d'une image */}
               {product.images.length > 1 && (
