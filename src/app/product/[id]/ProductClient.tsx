@@ -93,7 +93,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 font-sans">
       
       {/* Fake Sales Popup */}
-      <div className={`fixed bottom-4 left-4 right-4 md:left-auto md:right-4 bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-50 transition-all duration-500 flex items-center gap-4 ${showPopup ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}>
+      <div className={`fixed top-24 left-4 right-4 md:left-auto md:right-4 bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-50 transition-all duration-500 flex items-center gap-4 ${showPopup ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none'}`}>
         <div className="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 overflow-hidden relative">
           {product.images?.[0] && <Image src={product.images[0]} alt="Produit" fill className="object-cover" />}
         </div>
@@ -113,10 +113,10 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
       <main className="max-w-xl mx-auto mt-6 bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-100">
         {/* Product Image Carousel */}
-        <div className="bg-slate-200 aspect-square w-full relative flex items-center justify-center overflow-hidden">
+        <div className="bg-slate-50 aspect-[4/3] w-full relative flex items-center justify-center overflow-hidden">
           {product.images && product.images.length > 0 ? (
             <>
-              <Image src={product.images[currentImageIndex]} alt={product.title} fill className="object-cover" />
+              <Image src={product.images[currentImageIndex]} alt={product.title} fill className="object-contain p-2" />
               
               {/* Flèches de navigation si plus d'une image */}
               {product.images.length > 1 && (
