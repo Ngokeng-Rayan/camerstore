@@ -41,7 +41,7 @@ export default async function ProductsPage({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-8">
           {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl transition-all border border-slate-100 overflow-hidden group flex flex-col">
+            <Link href={`/product/${product.id}`} key={product.id} className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl transition-all border border-slate-100 overflow-hidden group flex flex-col cursor-pointer">
               <div className="bg-slate-100 aspect-square relative flex items-center justify-center overflow-hidden">
                 {product.images && product.images[0] ? (
                   <Image src={product.images[0]} alt={product.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -76,14 +76,13 @@ export default async function ProductsPage({
                   )}
                 </div>
                 
-                <Link 
-                  href={`/product/${product.id}`}
-                  className="block w-full bg-slate-900 hover:bg-brand-navy text-white text-center font-bold text-xs sm:text-base py-2 sm:py-3 rounded-lg sm:rounded-xl transition-colors border border-transparent hover:border-brand-green mt-auto"
+                <div 
+                  className="block w-full bg-slate-900 group-hover:bg-brand-navy text-white text-center font-bold text-xs sm:text-base py-2 sm:py-3 rounded-lg sm:rounded-xl transition-colors border border-transparent group-hover:border-brand-green mt-auto"
                 >
                   Commander
-                </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
           
           {products.length === 0 && (
