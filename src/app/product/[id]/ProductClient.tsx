@@ -30,8 +30,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
   // Réductions par quantité
   const getDiscount = (qty: number) => {
-    if (qty >= 3) return 0.20; // -20%
-    if (qty >= 2) return 0.10; // -10%
+    if (qty >= 3) return 0.35; // -35%
+    if (qty >= 2) return 0.20; // -20%
     return 0;
   };
   const discount = getDiscount(quantity);
@@ -353,7 +353,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                   onClick={() => setQuantity(2)}
                   className={`p-3 rounded-xl border-2 text-center transition-all relative ${quantity === 2 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
                 >
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-10%</div>
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-20%</div>
                   <div className="font-bold text-brand-navy text-lg">2</div>
                   <div className="text-xs text-orange-600 font-semibold">Populaire 🔥</div>
                 </button>
@@ -362,7 +362,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                   onClick={() => setQuantity(3)}
                   className={`p-3 rounded-xl border-2 text-center transition-all relative ${quantity >= 3 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
                 >
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-20%</div>
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-35%</div>
                   <div className="font-bold text-brand-navy text-lg">3+</div>
                   <div className="text-xs text-brand-red font-semibold">Meilleur Deal 💰</div>
                 </button>
@@ -583,7 +583,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
             });
             document.getElementById('order-form')?.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="w-full max-w-xl bg-brand-green hover:bg-lime-500 text-brand-navy font-extrabold text-lg py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg animate-heartbeat"
+          className="w-full max-w-xl bg-brand-green hover:bg-lime-500 text-brand-navy font-extrabold text-base py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg animate-heartbeat"
         >
           <ShoppingBag size={24} />
           COMMANDER MAINTENANT
@@ -623,7 +623,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
               {/* Offre spéciale */}
               <div className="bg-brand-green/10 border border-brand-green/30 rounded-xl p-3 mb-4">
-                <p className="text-brand-navy font-bold text-sm">🎁 Achetez 2 et bénéficiez de <span className="text-brand-red">-10%</span> immédiatement !</p>
+                <p className="text-brand-navy font-bold text-sm">🎁 Achetez 2 et bénéficiez de <span className="text-brand-red">-20%</span> immédiatement !</p>
               </div>
 
               {/* CTA */}
