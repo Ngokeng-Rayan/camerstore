@@ -29,41 +29,40 @@ export async function updateProductAction(id: string, formData: FormData) {
   const imageFiles = formData.getAll("imageFiles") as File[];
   let images = existingProduct.images; 
 
-  const uploadDir = path.join(process.cwd(), "public/uploads/products");
-
-  if (imageFiles.length > 0 && imageFiles[0].size > 0) {
-    await mkdir(uploadDir, { recursive: true });
-    images = []; // Remplace les anciennes images
-    for (const file of imageFiles) {
-      if (file && file.size > 0) {
-        if (!isValidFile(file)) continue;
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-        await writeFile(path.join(uploadDir, filename), buffer);
-        images.push(`/uploads/products/${filename}`);
-      }
-    }
-  }
-
-  const descriptionMediaFiles = formData.getAll("descriptionMediaFiles") as File[];
-  let descriptionMedia = existingProduct.descriptionMedia || [];
-
-  if (descriptionMediaFiles.length > 0 && descriptionMediaFiles[0].size > 0) {
-    await mkdir(uploadDir, { recursive: true });
-    // Si on veut ajouter, on concatène. Si on veut remplacer, on reset. On reset pour l'instant.
-    descriptionMedia = [];
-    for (const file of descriptionMediaFiles) {
-      if (file && file.size > 0) {
-        if (!isValidFile(file)) continue;
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-        await writeFile(path.join(uploadDir, filename), buffer);
-        descriptionMedia.push(`/uploads/products/${filename}`);
-      }
-    }
-  }
-
   try {
+    const uploadDir = path.join(process.cwd(), "public/uploads/products");
+
+    if (imageFiles.length > 0 && imageFiles[0].size > 0) {
+      await mkdir(uploadDir, { recursive: true });
+      images = []; // Remplace les anciennes images
+      for (const file of imageFiles) {
+        if (file && file.size > 0) {
+          if (!isValidFile(file)) continue;
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+          await writeFile(path.join(uploadDir, filename), buffer);
+          images.push(`/uploads/products/${filename}`);
+        }
+      }
+    }
+
+    const descriptionMediaFiles = formData.getAll("descriptionMediaFiles") as File[];
+    let descriptionMedia = existingProduct.descriptionMedia || [];
+
+    if (descriptionMediaFiles.length > 0 && descriptionMediaFiles[0].size > 0) {
+      await mkdir(uploadDir, { recursive: true });
+      descriptionMedia = [];
+      for (const file of descriptionMediaFiles) {
+        if (file && file.size > 0) {
+          if (!isValidFile(file)) continue;
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+          await writeFile(path.join(uploadDir, filename), buffer);
+          descriptionMedia.push(`/uploads/products/${filename}`);
+        }
+      }
+    }
+
     await prisma.product.update({
       where: { id },
       data: {
@@ -84,7 +83,8 @@ export async function updateProductAction(id: string, formData: FormData) {
     revalidatePath(`/product/${id}`);
     return { success: true };
   } catch (error) {
-    return { success: false, error: "Erreur lors de la modification du produit." };
+    console.error("Erreur détaillée lors de la modification:", error);
+    return { success: false, error: "Erreur lors de la modification du produit. (Vérifiez les permissions d'écriture du dossier public/uploads)" };
   }
 }
 
