@@ -21,8 +21,10 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes
   const [stock, setStock] = useState(3); // Valeur fixe par défaut pour éviter l'erreur d'hydratation (SSR)
   const [showPopup, setShowPopup] = useState(false);
-  const [popupCity, setPopupCity] = useState("Yaoundé");
-  const [popupTime, setPopupTime] = useState("Il y a 2 minutes");
+  const [popupCity, setPopupCity] = useState("Douala");
+  const [popupTime, setPopupTime] = useState("À l'instant");
+  const [popupType, setPopupType] = useState<"city" | "review">("city");
+  const [popupReview, setPopupReview] = useState<{ customerName: string; content: string; rating: number } | null>(null);
 
   useEffect(() => {
     // Calcul aléatoire uniquement côté client (après l'hydratation)
@@ -32,21 +34,72 @@ export default function ProductClient({ product, reviews }: { product: any, revi
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
-    // Fake sales popups
-    let popupInterval: NodeJS.Timeout;
-    const triggerPopup = () => {
-      const cities = ["Yaoundé", "Douala", "Bafoussam", "Garoua", "Kribi", "Maroua", "Ngaoundéré", "Bamenda", "Limbe", "Edéa"];
-      const times = ["À l'instant", "Il y a 2 minutes", "Il y a 4 minutes", "Il y a 7 minutes", "Il y a 12 minutes", "Il y a 25 minutes"];
-      setPopupCity(cities[Math.floor(Math.random() * cities.length)]);
-      setPopupTime(times[Math.floor(Math.random() * times.length)]);
+    // Fake sales popups — Séquence orchestrée
+    const POPUP_DISPLAY_DURATION = 4000; // Durée d'affichage de chaque popup
+    const allTimers: NodeJS.Timeout[] = [];
+
+    const showCityPopup = (city: string, time: string) => {
+      setPopupType("city");
+      setPopupCity(city);
+      setPopupTime(time);
       setShowPopup(true);
-      setTimeout(() => setShowPopup(false), 4000);
+      const hideTimer = setTimeout(() => setShowPopup(false), POPUP_DISPLAY_DURATION);
+      allTimers.push(hideTimer);
     };
 
-    const initialTimer = setTimeout(() => {
-      triggerPopup();
-      popupInterval = setInterval(triggerPopup, 45000); // Ensuite toutes les 45 secondes
-    }, 10000); // Premier affichage après 10 secondes
+    const showReviewPopup = (review: { customerName: string; content: string; rating: number }) => {
+      setPopupType("review");
+      setPopupReview(review);
+      setShowPopup(true);
+      const hideTimer = setTimeout(() => setShowPopup(false), POPUP_DISPLAY_DURATION);
+      allTimers.push(hideTimer);
+    };
+
+    // Étape 1 : Popup Douala après 3 secondes
+    const step1Timer = setTimeout(() => {
+      showCityPopup("Douala", "À l'instant");
+
+      // Étape 2 : Popups avis clients (5s d'intervalle chacun) après Douala
+      if (reviews.length > 0) {
+        reviews.forEach((review, index) => {
+          const reviewDelay = POPUP_DISPLAY_DURATION + 1000 + (index * 5000); // 1s pause après Douala, puis 5s entre chaque
+          const reviewTimer = setTimeout(() => {
+            showReviewPopup({ customerName: review.customerName, content: review.content, rating: review.rating });
+          }, reviewDelay);
+          allTimers.push(reviewTimer);
+        });
+
+        // Étape 3 : Popups villes aléatoires toutes les 60s, après tous les avis
+        const afterAllReviewsDelay = POPUP_DISPLAY_DURATION + 1000 + (reviews.length * 5000) + 1000;
+        const startCityLoopTimer = setTimeout(() => {
+          const cities = ["Yaoundé", "Bafoussam", "Garoua", "Kribi", "Maroua", "Ngaoundéré", "Bamenda", "Limbe", "Edéa", "Bertoua", "Ebolowa"];
+          const times = ["À l'instant", "Il y a 2 minutes", "Il y a 4 minutes", "Il y a 7 minutes", "Il y a 12 minutes"];
+          const cityInterval = setInterval(() => {
+            showCityPopup(
+              cities[Math.floor(Math.random() * cities.length)],
+              times[Math.floor(Math.random() * times.length)]
+            );
+          }, 60000);
+          allTimers.push(cityInterval as unknown as NodeJS.Timeout);
+        }, afterAllReviewsDelay);
+        allTimers.push(startCityLoopTimer);
+      } else {
+        // Pas d'avis → passer directement aux popups villes après 60s
+        const startCityLoopTimer = setTimeout(() => {
+          const cities = ["Yaoundé", "Bafoussam", "Garoua", "Kribi", "Maroua", "Ngaoundéré", "Bamenda", "Limbe", "Edéa", "Bertoua", "Ebolowa"];
+          const times = ["À l'instant", "Il y a 2 minutes", "Il y a 4 minutes", "Il y a 7 minutes", "Il y a 12 minutes"];
+          const cityInterval = setInterval(() => {
+            showCityPopup(
+              cities[Math.floor(Math.random() * cities.length)],
+              times[Math.floor(Math.random() * times.length)]
+            );
+          }, 60000);
+          allTimers.push(cityInterval as unknown as NodeJS.Timeout);
+        }, POPUP_DISPLAY_DURATION + 60000); // 60s après Douala
+        allTimers.push(startCityLoopTimer);
+      }
+    }, 3000); // Premier popup après 3 secondes
+    allTimers.push(step1Timer);
 
     // Stocker le _fbc si fbclid est dans l'URL
     getFbc();
@@ -60,7 +113,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
       currency: "XAF"
     });
 
-    return () => { clearInterval(timer); clearTimeout(initialTimer); clearInterval(popupInterval); };
+    return () => { clearInterval(timer); allTimers.forEach(t => { clearTimeout(t); clearInterval(t); }); };
   }, [product]);
 
   const formatTime = (seconds: number) => {
@@ -105,16 +158,36 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 font-sans">
       
-      {/* Fake Sales Popup */}
-      <div className={`fixed top-24 left-4 right-4 md:left-auto md:right-4 bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-[100] transition-all duration-500 flex items-center gap-4 ${showPopup ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none'}`}>
-        <div className="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 overflow-hidden relative">
-          {product.images?.[0] && <Image src={product.images[0]} alt="Produit" fill className="object-cover" />}
-        </div>
-        <div>
-          <p className="text-sm text-slate-600">Quelqu'un de <strong className="text-brand-navy">{popupCity}</strong> vient d'acheter</p>
-          <p className="font-bold text-brand-navy">{product.title}</p>
-          <p className="text-xs text-slate-400">{popupTime}</p>
-        </div>
+      {/* Fake Sales / Review Popup */}
+      <div className={`fixed top-24 left-4 right-4 md:left-auto md:right-4 md:max-w-sm bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-[100] transition-all duration-500 flex items-center gap-4 ${showPopup ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none'}`}>
+        {popupType === "city" ? (
+          <>
+            <div className="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 overflow-hidden relative">
+              {product.images?.[0] && <Image src={product.images[0]} alt="Produit" fill className="object-cover" />}
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Quelqu&apos;un de <strong className="text-brand-navy">{popupCity}</strong> vient d&apos;acheter</p>
+              <p className="font-bold text-brand-navy text-sm line-clamp-1">{product.title}</p>
+              <p className="text-xs text-slate-400">{popupTime}</p>
+            </div>
+          </>
+        ) : popupReview ? (
+          <>
+            <div className="w-12 h-12 bg-brand-green/20 rounded-full flex-shrink-0 flex items-center justify-center">
+              <span className="text-brand-navy font-bold text-lg">{popupReview.customerName.charAt(0).toUpperCase()}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1 mb-0.5">
+                <span className="font-bold text-brand-navy text-sm">{popupReview.customerName}</span>
+                <svg className="w-3.5 h-3.5 text-green-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+              </div>
+              <div className="flex mb-1">
+                {[...Array(popupReview.rating)].map((_, i) => <Star key={i} size={12} className="fill-yellow-400 text-yellow-400" />)}
+              </div>
+              <p className="text-xs text-slate-600 italic line-clamp-2">&quot;{popupReview.content}&quot;</p>
+            </div>
+          </>
+        ) : null}
       </div>
 
       {/* Top Banner Warning */}
