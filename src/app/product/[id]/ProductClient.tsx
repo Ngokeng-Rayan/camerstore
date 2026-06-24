@@ -32,14 +32,20 @@ export default function ProductClient({ product, reviews }: { product: any, revi
     }, 1000);
 
     // Fake sales popups
-    const popupTimer = setInterval(() => {
+    let popupInterval: NodeJS.Timeout;
+    const triggerPopup = () => {
       const cities = ["Yaoundé", "Douala", "Bafoussam", "Garoua", "Kribi", "Maroua", "Ngaoundéré", "Bamenda", "Limbe", "Edéa"];
       const times = ["À l'instant", "Il y a 2 minutes", "Il y a 4 minutes", "Il y a 7 minutes", "Il y a 12 minutes", "Il y a 25 minutes"];
       setPopupCity(cities[Math.floor(Math.random() * cities.length)]);
       setPopupTime(times[Math.floor(Math.random() * times.length)]);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false), 4000);
-    }, 25000); // Toutes les 25 secondes
+    };
+
+    const initialTimer = setTimeout(() => {
+      triggerPopup();
+      popupInterval = setInterval(triggerPopup, 45000); // Ensuite toutes les 45 secondes
+    }, 10000); // Premier affichage après 10 secondes
 
     // Stocker le _fbc si fbclid est dans l'URL
     getFbc();
@@ -53,7 +59,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
       currency: "XAF"
     });
 
-    return () => { clearInterval(timer); clearInterval(popupTimer); };
+    return () => { clearInterval(timer); clearTimeout(initialTimer); clearInterval(popupInterval); };
   }, [product]);
 
   const formatTime = (seconds: number) => {
