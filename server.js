@@ -63,6 +63,24 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // Servir les fichiers statiques uploadés (images produits, etc.)
+    const parsedUrl = require('url').parse(req.url, true);
+    if (parsedUrl.pathname && parsedUrl.pathname.startsWith('/uploads/')) {
+        const filePath = path.join(__dirname, 'public', parsedUrl.pathname);
+        if (fs.existsSync(filePath)) {
+            const ext = path.extname(filePath).toLowerCase();
+            const mimeTypes = {
+                '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+                '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml',
+                '.mp4': 'video/mp4',
+            };
+            res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            fs.createReadStream(filePath).pipe(res);
+            return;
+        }
+    }
+
     if (!nextHandler) {
         res.statusCode = 503;
         res.setHeader('Content-Type', 'text/plain');
@@ -71,7 +89,7 @@ const server = http.createServer((req, res) => {
     }
 
     try {
-        nextHandler(req, res, require('url').parse(req.url, true)).catch(err => {
+        nextHandler(req, res, parsedUrl).catch(err => {
             log("nextHandler rejected with error: " + (err.stack || err.message || err));
             res.statusCode = 500;
             res.setHeader('Content-Type', 'text/plain');
