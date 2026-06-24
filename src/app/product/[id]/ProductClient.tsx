@@ -16,6 +16,9 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [eventId] = useState(() => crypto.randomUUID());
+  const [hasOrdered, setHasOrdered] = useState(false);
+  const [showExitPopup, setShowExitPopup] = useState(false);
+  const [exitPopupShown, setExitPopupShown] = useState(false);
   
   // Fake urgency state (Shopify apps cost $25/mo for this)
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes
@@ -24,6 +27,18 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   const [popupCity, setPopupCity] = useState("Douala");
   const [popupTime, setPopupTime] = useState("À l'instant");
   const [popupType, setPopupType] = useState<"city" | "review">("city");
+
+  // Réductions par quantité
+  const getDiscount = (qty: number) => {
+    if (qty >= 3) return 0.20; // -20%
+    if (qty >= 2) return 0.10; // -10%
+    return 0;
+  };
+  const discount = getDiscount(quantity);
+  const unitPrice = Math.round(product.sellingPrice * (1 - discount));
+  const totalPrice = unitPrice * quantity;
+  const totalWithoutDiscount = product.sellingPrice * quantity;
+  const savings = totalWithoutDiscount - totalPrice;
   const [popupReview, setPopupReview] = useState<{ customerName: string; content: string; rating: number } | null>(null);
 
   useEffect(() => {
@@ -113,8 +128,34 @@ export default function ProductClient({ product, reviews }: { product: any, revi
       currency: "XAF"
     });
 
-    return () => { clearInterval(timer); allTimers.forEach(t => { clearTimeout(t); clearInterval(t); }); };
-  }, [product]);
+    // Exit-intent : détecter quand l'utilisateur veut quitter
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !exitPopupShown && !hasOrdered) {
+        setShowExitPopup(true);
+        setExitPopupShown(true);
+      }
+    };
+    // Mobile : détecter le bouton retour via l'événement popstate
+    const handleBackButton = () => {
+      if (!exitPopupShown && !hasOrdered) {
+        setShowExitPopup(true);
+        setExitPopupShown(true);
+        // Empêcher la navigation immédiate
+        window.history.pushState(null, '', window.location.href);
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handleBackButton);
+
+    return () => {
+      clearInterval(timer);
+      allTimers.forEach(t => { clearTimeout(t); clearInterval(t); });
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [product, exitPopupShown, hasOrdered]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -134,19 +175,20 @@ export default function ProductClient({ product, reviews }: { product: any, revi
     const result = await createOrder(formData);
 
     if (result.success) {
+      setHasOrdered(true);
       // Le client a rempli le formulaire COD mais n'a pas encore payé/confirmé au téléphone.
       // On envoie 'InitiateCheckout' au lieu de 'Purchase' pour ne pas fausser l'algorithme de Meta.
       fbEvent("InitiateCheckout", {
         content_ids: [product.id],
         content_name: product.title,
         content_type: "product",
-        value: product.sellingPrice * quantity,
+        value: totalPrice,
         currency: "XAF"
       });
       fbEvent("Lead", {
         content_name: product.title,
         currency: "XAF",
-        value: product.sellingPrice * quantity
+        value: totalPrice
       });
       router.push(`/product/${product.id}/upsell?orderId=${result.orderId}`);
     } else {
@@ -296,8 +338,38 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                 </div>
               </div>
 
-              {/* Sélecteur de Quantité */}
-              <div className="flex justify-center mb-6">
+              {/* Offres par Quantité */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setQuantity(1)}
+                  className={`p-3 rounded-xl border-2 text-center transition-all ${quantity === 1 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                >
+                  <div className="font-bold text-brand-navy text-lg">1</div>
+                  <div className="text-xs text-slate-500">Prix normal</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(2)}
+                  className={`p-3 rounded-xl border-2 text-center transition-all relative ${quantity === 2 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                >
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-10%</div>
+                  <div className="font-bold text-brand-navy text-lg">2</div>
+                  <div className="text-xs text-orange-600 font-semibold">Populaire 🔥</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(3)}
+                  className={`p-3 rounded-xl border-2 text-center transition-all relative ${quantity >= 3 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                >
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-20%</div>
+                  <div className="font-bold text-brand-navy text-lg">3+</div>
+                  <div className="text-xs text-brand-red font-semibold">Meilleur Deal 💰</div>
+                </button>
+              </div>
+
+              {/* Sélecteur de Quantité fin */}
+              <div className="flex justify-center mb-4">
                 <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-white">
                   <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-2 text-slate-600 hover:bg-slate-100 transition-colors">
                     <Minus size={16} />
@@ -309,11 +381,25 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                 </div>
               </div>
 
+              {/* Badge de réduction si applicable */}
+              {discount > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-center">
+                  <p className="text-green-700 font-bold text-sm">🎉 Réduction de {Math.round(discount * 100)}% appliquée ! Vous économisez {savings.toLocaleString('fr-FR')} FCFA</p>
+                </div>
+              )}
+
               {/* Totaux */}
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4 space-y-2 text-sm md:text-base">
                 <div className="flex justify-between text-slate-600">
-                  <span>Sous-total</span>
-                  <span className="font-bold text-brand-navy">{(product.sellingPrice * quantity).toLocaleString('fr-FR')} FCFA</span>
+                  <span>Sous-total ({quantity}x)</span>
+                  {discount > 0 ? (
+                    <div className="text-right">
+                      <span className="text-slate-400 line-through text-xs mr-2">{totalWithoutDiscount.toLocaleString('fr-FR')} FCFA</span>
+                      <span className="font-bold text-brand-navy">{totalPrice.toLocaleString('fr-FR')} FCFA</span>
+                    </div>
+                  ) : (
+                    <span className="font-bold text-brand-navy">{totalPrice.toLocaleString('fr-FR')} FCFA</span>
+                  )}
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>Livraison</span>
@@ -321,7 +407,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-200 mt-2 text-lg">
                   <span className="font-bold text-slate-800">Total</span>
-                  <span className="font-bold text-brand-navy">{(product.sellingPrice * quantity).toLocaleString('fr-FR')} FCFA</span>
+                  <span className="font-bold text-brand-navy">{totalPrice.toLocaleString('fr-FR')} FCFA</span>
                 </div>
               </div>
 
@@ -503,6 +589,65 @@ export default function ProductClient({ product, reviews }: { product: any, revi
           COMMANDER MAINTENANT
         </button>
       </div>
+
+      {/* Exit-Intent Popup */}
+      {showExitPopup && (
+        <div className="fixed inset-0 bg-black/60 z-[200] flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl animate-scaleIn">
+            {/* Bouton fermer */}
+            <button 
+              onClick={() => setShowExitPopup(false)}
+              className="absolute top-3 right-3 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition-colors"
+            >
+              ✕
+            </button>
+
+            {/* Contenu */}
+            <div className="text-center">
+              <div className="text-4xl mb-3">😱</div>
+              <h3 className="text-xl font-extrabold text-brand-navy mb-2">Attendez ! Ne partez pas...</h3>
+              <p className="text-slate-600 text-sm mb-4">
+                Vous allez manquer une offre exceptionnelle ! Ce produit est très demandé et le stock est <strong className="text-brand-red">très limité</strong>.
+              </p>
+
+              {/* Mini récap produit */}
+              <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl mb-4">
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-200 shrink-0">
+                  {product.images?.[0] && <Image src={product.images[0]} alt="Produit" fill className="object-cover" />}
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-bold text-brand-navy text-sm line-clamp-2">{product.title}</p>
+                  <p className="text-brand-red font-extrabold">{product.sellingPrice.toLocaleString('fr-FR')} FCFA</p>
+                </div>
+              </div>
+
+              {/* Offre spéciale */}
+              <div className="bg-brand-green/10 border border-brand-green/30 rounded-xl p-3 mb-4">
+                <p className="text-brand-navy font-bold text-sm">🎁 Achetez 2 et bénéficiez de <span className="text-brand-red">-10%</span> immédiatement !</p>
+              </div>
+
+              {/* CTA */}
+              <button 
+                onClick={() => {
+                  setShowExitPopup(false);
+                  document.getElementById('order-form')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="w-full bg-brand-green hover:bg-lime-500 text-brand-navy font-extrabold text-base py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg animate-heartbeat"
+              >
+                <ShoppingBag size={20} />
+                OUI, JE VEUX EN PROFITER !
+              </button>
+
+              <button 
+                onClick={() => setShowExitPopup(false)}
+                className="mt-3 text-slate-400 text-xs hover:text-slate-600 transition-colors"
+              >
+                Non merci, je préfère rater cette offre
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
