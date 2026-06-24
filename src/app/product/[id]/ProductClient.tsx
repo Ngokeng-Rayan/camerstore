@@ -20,6 +20,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes
   const [stock, setStock] = useState(3); // Valeur fixe par défaut pour éviter l'erreur d'hydratation (SSR)
   const [showPopup, setShowPopup] = useState(false);
+  const [popupCity, setPopupCity] = useState("Yaoundé");
+  const [popupTime, setPopupTime] = useState("Il y a 2 minutes");
 
   useEffect(() => {
     // Calcul aléatoire uniquement côté client (après l'hydratation)
@@ -31,6 +33,10 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
     // Fake sales popups
     const popupTimer = setInterval(() => {
+      const cities = ["Yaoundé", "Douala", "Bafoussam", "Garoua", "Kribi", "Maroua", "Ngaoundéré", "Bamenda", "Limbe", "Edéa"];
+      const times = ["À l'instant", "Il y a 2 minutes", "Il y a 4 minutes", "Il y a 7 minutes", "Il y a 12 minutes", "Il y a 25 minutes"];
+      setPopupCity(cities[Math.floor(Math.random() * cities.length)]);
+      setPopupTime(times[Math.floor(Math.random() * times.length)]);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false), 4000);
     }, 25000); // Toutes les 25 secondes
@@ -93,14 +99,14 @@ export default function ProductClient({ product, reviews }: { product: any, revi
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 font-sans">
       
       {/* Fake Sales Popup */}
-      <div className={`fixed top-24 left-4 right-4 md:left-auto md:right-4 bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-50 transition-all duration-500 flex items-center gap-4 ${showPopup ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none'}`}>
+      <div className={`fixed top-24 left-4 right-4 md:left-auto md:right-4 bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-[100] transition-all duration-500 flex items-center gap-4 ${showPopup ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none'}`}>
         <div className="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 overflow-hidden relative">
           {product.images?.[0] && <Image src={product.images[0]} alt="Produit" fill className="object-cover" />}
         </div>
         <div>
-          <p className="text-sm text-slate-600">Quelqu'un de <strong className="text-brand-navy">Yaoundé</strong> vient d'acheter</p>
+          <p className="text-sm text-slate-600">Quelqu'un de <strong className="text-brand-navy">{popupCity}</strong> vient d'acheter</p>
           <p className="font-bold text-brand-navy">{product.title}</p>
-          <p className="text-xs text-slate-400">Il y a 2 minutes</p>
+          <p className="text-xs text-slate-400">{popupTime}</p>
         </div>
       </div>
 
