@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
     // On désactive l'optimisation d'image côté serveur pour éviter les erreurs 500.
     unoptimized: true,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
 };
 
 export default nextConfig;
