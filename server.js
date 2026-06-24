@@ -65,6 +65,15 @@ const server = http.createServer((req, res) => {
 
     // Servir les fichiers statiques uploadés (images produits, etc.)
     const parsedUrl = require('url').parse(req.url, true);
+    
+    // Intercepter les requêtes d'optimisation d'image Next.js (qui plantent sans sharp)
+    // et rediriger vers l'image originale non optimisée.
+    if (parsedUrl.pathname === '/_next/image' && parsedUrl.query.url) {
+        res.writeHead(302, { Location: parsedUrl.query.url });
+        res.end();
+        return;
+    }
+
     if (parsedUrl.pathname && parsedUrl.pathname.startsWith('/uploads/')) {
         const filePath = path.join(__dirname, 'public', parsedUrl.pathname);
         if (fs.existsSync(filePath)) {
