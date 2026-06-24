@@ -12,6 +12,7 @@ import { fbEvent, getFbc } from "@/components/FacebookPixel";
 export default function ProductClient({ product, reviews }: { product: any, reviews: any[] }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [eventId] = useState(() => crypto.randomUUID());
@@ -261,7 +262,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               </div>
 
               {/* Formulaire Champs */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} onFocus={() => setIsInputFocused(true)} onBlur={() => setIsInputFocused(false)} className="space-y-4">
                 <div>
                   <label className="block text-sm font-bold text-brand-navy mb-1">Nom et Prenom<span className="text-red-500">*</span></label>
                   <div className="flex items-stretch border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-green focus-within:border-brand-green transition-all bg-white">
@@ -411,7 +412,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
       </div>
 
       {/* Sticky Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-slate-200 z-50 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] flex justify-center md:hidden">
+      <div className={`fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-slate-200 z-50 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] justify-center md:hidden transition-transform duration-300 ${isInputFocused ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 flex'}`}>
         <button 
           onClick={() => {
             fbEvent("AddToCart", {
