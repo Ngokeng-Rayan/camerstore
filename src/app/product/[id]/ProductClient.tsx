@@ -119,10 +119,10 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
       <main className="max-w-xl mx-auto mt-6 bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-100">
         {/* Product Image Carousel */}
-        <div className="bg-slate-50 aspect-[4/3] w-full relative flex items-center justify-center overflow-hidden">
+        <div className="bg-slate-100 aspect-square w-full relative flex items-center justify-center overflow-hidden">
           {product.images && product.images.length > 0 ? (
             <>
-              <Image src={product.images[currentImageIndex]} alt={product.title} fill className="object-contain p-2" />
+              <Image src={product.images[currentImageIndex]} alt={product.title} fill className="object-cover" />
               
               {/* Flèches de navigation si plus d'une image */}
               {product.images.length > 1 && (
