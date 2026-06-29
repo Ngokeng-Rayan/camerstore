@@ -387,9 +387,9 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                       <div className="flex items-center gap-2 md:gap-3 text-right">
                         <div className="flex flex-col items-end justify-center">
                            {option.discountPct > 0 && (
-                             <span className="text-[10px] text-slate-400 line-through font-semibold">FCFA {originalPrice.toLocaleString('fr-FR')}</span>
+                             <span className="text-[10px] text-red-500 line-through font-semibold">FCFA {originalPrice.toLocaleString('fr-FR')}</span>
                            )}
-                           <span className="font-extrabold text-brand-navy text-xs md:text-[13px]">FCFA {itemTotalPrice.toLocaleString('fr-FR')}</span>
+                           <span className="font-extrabold text-green-600 text-xs md:text-[13px]">FCFA {itemTotalPrice.toLocaleString('fr-FR')}</span>
                         </div>
                         
                         {/* Thumbnail */}
