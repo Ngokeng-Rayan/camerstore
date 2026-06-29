@@ -339,33 +339,69 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               </div>
 
               {/* Offres par Quantité */}
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <button
-                  type="button"
-                  onClick={() => setQuantity(1)}
-                  className={`p-3 rounded-xl border-2 text-center transition-all ${quantity === 1 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                >
-                  <div className="font-bold text-brand-navy text-lg">1</div>
-                  <div className="text-xs text-slate-500">Prix normal</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuantity(2)}
-                  className={`p-3 rounded-xl border-2 text-center transition-all relative ${quantity === 2 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                >
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-20%</div>
-                  <div className="font-bold text-brand-navy text-lg">2</div>
-                  <div className="text-xs text-orange-600 font-semibold">Populaire 🔥</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuantity(3)}
-                  className={`p-3 rounded-xl border-2 text-center transition-all relative ${quantity >= 3 ? 'border-brand-green bg-brand-green/10 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                >
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-35%</div>
-                  <div className="font-bold text-brand-navy text-lg">3+</div>
-                  <div className="text-xs text-brand-red font-semibold">Meilleur Deal 💰</div>
-                </button>
+              <div className="flex flex-col gap-3 mb-6 mt-2">
+                {[
+                  { qty: 1, discountStr: null, discountPct: 0, label: "Achetez 1 article" },
+                  { qty: 2, discountStr: "20%", discountPct: 0.20, label: "Achetez 2 articles", badge: "Populaire 🔥", badgeColor: "bg-orange-500" },
+                  { qty: 3, discountStr: "35%", discountPct: 0.35, label: "Achetez 3 articles", badge: "Meilleur Deal 💰", badgeColor: "bg-brand-red" }
+                ].map((option) => {
+                  const isSelected = quantity === option.qty || (option.qty === 3 && quantity >= 3);
+                  const itemTotalPrice = Math.round(product.sellingPrice * option.qty * (1 - option.discountPct));
+                  const originalPrice = product.sellingPrice * option.qty;
+                  
+                  return (
+                    <button
+                      key={option.qty}
+                      type="button"
+                      onClick={() => setQuantity(option.qty)}
+                      className={`p-3 rounded-xl border-2 text-left transition-all relative flex items-center justify-between ${isSelected ? 'border-brand-green bg-brand-green/5 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                    >
+                      {option.badge && (
+                        <div className={`absolute -top-2 left-4 ${option.badgeColor} text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider`}>
+                          {option.badge}
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-2 md:gap-3">
+                        {/* Radio icon */}
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-brand-green' : 'border-slate-300'}`}>
+                          {isSelected && <div className="w-2.5 h-2.5 bg-brand-green rounded-full" />}
+                        </div>
+                        
+                        {/* Text content */}
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-bold text-brand-navy text-xs md:text-[13px] leading-tight">{option.label}</span>
+                          {option.discountStr ? (
+                            <span className="bg-brand-green text-white text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded w-fit inline-block">
+                              de réduction {option.discountStr}
+                            </span>
+                          ) : (
+                            <span className="bg-slate-300 text-white text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded w-fit inline-block">
+                              de réduction 0%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right side: Prices and Image */}
+                      <div className="flex items-center gap-2 md:gap-3 text-right">
+                        <div className="flex flex-col items-end justify-center">
+                           {option.discountPct > 0 && (
+                             <span className="text-[10px] text-slate-400 line-through font-semibold">FCFA {originalPrice.toLocaleString('fr-FR')}</span>
+                           )}
+                           <span className="font-extrabold text-brand-navy text-xs md:text-[13px]">FCFA {itemTotalPrice.toLocaleString('fr-FR')}</span>
+                        </div>
+                        
+                        {/* Thumbnail */}
+                        {product.images?.[0] && (
+                          <div className="w-10 h-10 rounded border border-slate-200 relative overflow-hidden shrink-0 bg-slate-50 hidden sm:block">
+                            <Image src={product.images[0]} alt="Miniature" fill className="object-cover" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Sélecteur de Quantité fin */}
