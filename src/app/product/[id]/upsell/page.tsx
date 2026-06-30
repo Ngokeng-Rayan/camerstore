@@ -30,31 +30,31 @@ export default async function UpsellPage({ params }: { params: Promise<{ id: str
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <FrontNavbar />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 w-full">
         
         {/* Success Notification */}
-        <div className="flex flex-col items-center justify-center text-center mb-12">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-lg">
-            <CheckCircle className="text-green-600" size={40} />
+        <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-12">
+          <div className="w-14 h-14 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mb-2 sm:mb-4 border-2 sm:border-4 border-white shadow-md sm:shadow-lg">
+            <CheckCircle className="text-green-600 w-8 h-8 sm:w-10 sm:h-10" />
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-brand-navy mb-3 sm:mb-4 px-2">
+          <h1 className="text-xl sm:text-4xl font-black text-brand-navy mb-1 sm:mb-4 px-2">
             Merci pour votre commande !
           </h1>
-          <p className="text-slate-600 max-w-2xl text-sm sm:text-lg px-2">
+          <p className="text-slate-600 max-w-2xl text-xs sm:text-lg px-2">
             Votre commande a été enregistrée avec succès. Notre équipe vous contactera très prochainement pour la livraison.
           </p>
         </div>
 
         {relatedProducts.length > 0 && (
-          <div className="mt-8 border-t border-slate-200 pt-12">
-            <div className="mb-6 sm:mb-10 text-center">
-              <h2 className="text-xl sm:text-3xl font-black text-brand-navy mb-2 sm:mb-4 px-2">
+          <div className="mt-2 sm:mt-8 border-t border-slate-200 pt-6 sm:pt-12">
+            <div className="mb-4 sm:mb-10 text-center">
+              <h2 className="text-lg sm:text-3xl font-black text-brand-navy mb-1 sm:mb-4 px-2">
                 Complétez votre commande
               </h2>
-              <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base px-2">
+              <p className="text-slate-500 max-w-2xl mx-auto text-xs sm:text-base px-2">
                 Puisque vous avez aimé cet article, voici d'autres produits de la même catégorie qui pourraient vous intéresser avec livraison groupée !
               </p>
-              <div className="w-24 h-1 bg-brand-green mx-auto rounded-full mt-6"></div>
+              <div className="w-16 sm:w-24 h-1 bg-brand-green mx-auto rounded-full mt-3 sm:mt-6"></div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-8">
