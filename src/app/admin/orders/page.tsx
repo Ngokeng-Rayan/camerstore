@@ -4,6 +4,7 @@ import { formatDistanceToNow, startOfDay, startOfWeek, startOfMonth, startOfYear
 import { fr } from "date-fns/locale";
 import Link from "next/link";
 import { OrderStatusSelect } from "./OrderStatusSelect";
+import { OrderExpensesModal } from "./OrderExpensesModal";
 
 export default async function OrdersCRM({
   searchParams,
@@ -181,6 +182,11 @@ export default async function OrdersCRM({
                 <div className="text-sm text-slate-600 bg-slate-50 p-2 rounded">📍 {order.customerCity}, {order.customerAddress}</div>
                 <div className="mt-2">
                   <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+                  {order.status === "DELIVERED" && (
+                    <div className="mt-2">
+                      <OrderExpensesModal orderId={order.id} deliveryNotes={order.deliveryNotes} />
+                    </div>
+                  )}
                 </div>
               </div>
             ))
@@ -221,6 +227,11 @@ export default async function OrdersCRM({
                     </td>
                     <td className="p-4">
                       <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+                      {order.status === "DELIVERED" && (
+                        <div className="mt-1">
+                          <OrderExpensesModal orderId={order.id} deliveryNotes={order.deliveryNotes} />
+                        </div>
+                      )}
                     </td>
                     <td className="p-4 text-right text-sm text-slate-500">
                       {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: fr })}

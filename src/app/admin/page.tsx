@@ -35,7 +35,8 @@ export default async function AdminDashboard({
   // 1. Récupérer les commandes filtrées pour les KPIs
   const filteredOrders = await prisma.order.findMany({
     where: period !== 'all' ? { createdAt: dateFilter } : undefined,
-    orderBy: { createdAt: 'asc' }
+    orderBy: { createdAt: 'asc' },
+    include: { product: true }
   });
 
   // Pour le graphe des 7 derniers jours (indépendant du filtre de période pour rester cohérent, ou on peut le filtrer, mais on le garde sur 7 jours)
@@ -54,6 +55,7 @@ export default async function AdminDashboard({
   });
 
   let totalRevenue = 0;
+  let totalNetProfit = 0;
   let deliveredOrdersCount = 0;
   let newLeadsCount = 0;
 
@@ -61,6 +63,22 @@ export default async function AdminDashboard({
     if (order.status === "DELIVERED") {
       totalRevenue += order.totalPrice;
       deliveredOrdersCount++;
+      
+      let productCost = (order.product?.costPrice || 0) * order.quantity;
+      let deliveryCost = 0;
+      let adCost = 0;
+      
+      try {
+        if (order.deliveryNotes && order.deliveryNotes.trim().startsWith("{")) {
+          const parsed = JSON.parse(order.deliveryNotes);
+          if (parsed.expenses) {
+            deliveryCost = parsed.expenses.deliveryCost || 0;
+            adCost = parsed.expenses.adCost || 0;
+          }
+        }
+      } catch(e) {}
+      
+      totalNetProfit += (order.totalPrice - productCost - deliveryCost - adCost);
     }
     if (order.status === "NEW_LEAD") {
       newLeadsCount++;
@@ -145,11 +163,17 @@ export default async function AdminDashboard({
       </div>
       
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <KpiCard 
-          title="Chiffre d'Affaires (Encaissé)" 
+          title="Chiffre d'Affaires" 
           value={`${totalRevenue.toLocaleString('fr-FR')} FCFA`} 
           icon={<DollarSign className="text-brand-green" size={24} />} 
+          trend={period !== 'all' ? "Sur la période" : "Global"} 
+        />
+        <KpiCard 
+          title="Bénéfice Net" 
+          value={`${totalNetProfit.toLocaleString('fr-FR')} FCFA`} 
+          icon={<TrendingUp className="text-brand-navy" size={24} />} 
           trend={period !== 'all' ? "Sur la période" : "Global"} 
         />
         <KpiCard 
