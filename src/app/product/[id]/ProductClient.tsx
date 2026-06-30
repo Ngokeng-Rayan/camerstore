@@ -455,7 +455,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               </div>
 
               {/* Formulaire Champs */}
-              <form id="order-inputs" onSubmit={handleSubmit} onFocus={() => setIsInputFocused(true)} onBlur={() => setIsInputFocused(false)} className="space-y-4">
+              <form id="order-inputs" onSubmit={handleSubmit} onFocus={() => setIsInputFocused(true)} onBlur={() => setIsInputFocused(false)} className="space-y-4 scroll-mt-32">
                 <div>
                   <label className="block text-sm font-bold text-brand-navy mb-1">Nom et Prenom<span className="text-red-500">*</span></label>
                   <div className="flex items-stretch border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-green focus-within:border-brand-green transition-all bg-white">
