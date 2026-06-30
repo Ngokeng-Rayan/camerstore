@@ -22,7 +22,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   
   // Fake urgency state (Shopify apps cost $25/mo for this)
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes
-  const [stock, setStock] = useState(3); // Valeur fixe par défaut pour éviter l'erreur d'hydratation (SSR)
+  const [hasClickedSticky, setHasClickedSticky] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupCity, setPopupCity] = useState("Douala");
   const [popupTime, setPopupTime] = useState("À l'instant");
@@ -42,8 +42,6 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   const [popupReview, setPopupReview] = useState<{ customerName: string; content: string; rating: number } | null>(null);
 
   useEffect(() => {
-    // Calcul aléatoire uniquement côté client (après l'hydratation)
-    setStock(Math.floor(Math.random() * 5) + 2); // Entre 2 et 6
     // Countdown Timer
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -286,7 +284,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
         {/* Scarcity Box (N°1) */}
         <div className="mx-4 mt-4 border-2 border-brand-red text-brand-red p-2 text-center font-bold text-xs md:text-sm tracking-wider bg-white rounded-lg">
-          LE N°1 EN AFRIQUE FRANCOPHONE | SEULEMENT {stock} DISPONIBLES |
+          LE N°1 EN AFRIQUE FRANCOPHONE | SEULEMENT 5 DISPONIBLES |
         </div>
 
         <div className="p-4 md:p-6">
@@ -457,7 +455,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               </div>
 
               {/* Formulaire Champs */}
-              <form onSubmit={handleSubmit} onFocus={() => setIsInputFocused(true)} onBlur={() => setIsInputFocused(false)} className="space-y-4">
+              <form id="order-inputs" onSubmit={handleSubmit} onFocus={() => setIsInputFocused(true)} onBlur={() => setIsInputFocused(false)} className="space-y-4">
                 <div>
                   <label className="block text-sm font-bold text-brand-navy mb-1">Nom et Prenom<span className="text-red-500">*</span></label>
                   <div className="flex items-stretch border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-green focus-within:border-brand-green transition-all bg-white">
@@ -617,7 +615,12 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               value: product.sellingPrice,
               currency: "XAF"
             });
-            document.getElementById('order-form')?.scrollIntoView({ behavior: 'smooth' });
+            if (!hasClickedSticky) {
+              setHasClickedSticky(true);
+              document.getElementById('order-form')?.scrollIntoView({ behavior: 'smooth' });
+            } else {
+              document.getElementById('order-inputs')?.scrollIntoView({ behavior: 'smooth' });
+            }
           }}
           className="w-full max-w-xl bg-brand-green hover:bg-lime-500 text-brand-navy font-extrabold text-base py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg animate-heartbeat"
         >
