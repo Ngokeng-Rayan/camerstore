@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import FacebookPixel from "@/components/FacebookPixel";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
           <FacebookPixel />
         </Suspense>
         {children}
+        <WhatsAppButton />
       </body>
     </html>
   );
