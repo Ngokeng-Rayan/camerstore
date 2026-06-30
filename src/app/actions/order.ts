@@ -96,11 +96,7 @@ export async function createOrder(formData: FormData) {
       }
     });
 
-    // 6. Envoyer l'email de notification en arrière-plan sans bloquer
-    sendNewOrderNotification(order, product.title).catch((e) => {
-      console.error("Erreur d'envoi d'email :", e);
-    });
-
+    // L'envoi d'email est désormais délégué au client via l'API pour ne pas bloquer la réponse
     return { success: true, orderId: order.id };
   } catch (error) {
     console.error("Erreur lors de la création de la commande :", error);

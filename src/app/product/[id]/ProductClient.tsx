@@ -188,7 +188,16 @@ export default function ProductClient({ product, reviews }: { product: any, revi
         currency: "XAF",
         value: totalPrice
       });
-      router.push(`/product/${product.id}/upsell?orderId=${result.orderId}`);
+      
+      // Déclenche l'envoi de l'email en arrière-plan sans bloquer
+      fetch('/api/notify-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: result.orderId })
+      }).catch(console.error);
+
+      // Redirection immédiate pour éviter tout blocage (remplace router.push par un changement de location direct)
+      window.location.href = `/product/${product.id}/upsell?orderId=${result.orderId}`;
     } else {
       alert(result.error);
       setIsSubmitting(false);
