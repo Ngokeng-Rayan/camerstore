@@ -1,10 +1,12 @@
 import prisma from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
 import { MessageCircle, ShoppingBag, PhoneCall, CheckCircle, Truck, PackageCheck, XCircle } from "lucide-react";
 import { formatDistanceToNow, startOfDay, startOfWeek, startOfMonth, startOfYear } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
 import { OrderStatusSelect } from "./OrderStatusSelect";
 import { OrderExpensesModal } from "./OrderExpensesModal";
+import { DeleteOrderButton } from "./DeleteOrderButton";
 
 export default async function OrdersCRM({
   searchParams,
@@ -40,6 +42,10 @@ export default async function OrdersCRM({
   } else if (dateRange === 'year') {
     whereClause.createdAt = { gte: startOfYear(now) };
   }
+
+  // Rôle de l'utilisateur connecté
+  const session = await getSession();
+  const isAdmin = session?.role === "ADMIN";
 
   // Fetch orders
   const orders = await prisma.order.findMany({
@@ -175,7 +181,10 @@ export default async function OrdersCRM({
                   </div>
                   <div className="text-right">
                     <div className="text-brand-green font-bold text-sm">{order.totalPrice.toLocaleString('fr-FR')} FCFA</div>
-                    <div className="text-xs text-slate-400 mt-1">{formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: fr })}</div>
+                    <div className="flex items-center justify-end gap-2 mt-1">
+                      <div className="text-xs text-slate-400">{formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: fr })}</div>
+                      {isAdmin && <DeleteOrderButton orderId={order.id} />}
+                    </div>
                   </div>
                 </div>
                 <div className="text-sm font-medium text-slate-800 line-clamp-1">{order.product.title}</div>
@@ -233,8 +242,11 @@ export default async function OrdersCRM({
                         </div>
                       )}
                     </td>
-                    <td className="p-4 text-right text-sm text-slate-500">
-                      {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: fr })}
+                    <td className="p-4 text-right">
+                      <div className="flex flex-col items-end gap-2">
+                        <span className="text-sm text-slate-500">{formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: fr })}</span>
+                        {isAdmin && <DeleteOrderButton orderId={order.id} />}
+                      </div>
                     </td>
                   </tr>
                 ))
