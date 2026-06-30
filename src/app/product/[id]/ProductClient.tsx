@@ -173,6 +173,14 @@ export default function ProductClient({ product, reviews }: { product: any, revi
     const result = await createOrder(formData);
 
     if (result.success) {
+      if (result.isBot) {
+        // Si c'est un bot bloqué par le honeypot, on fait semblant que tout s'est bien passé
+        // mais on n'envoie PAS d'événements Pixel et on réinitialise juste le formulaire.
+        setIsSubmitting(false);
+        setHasOrdered(true);
+        return;
+      }
+
       setHasOrdered(true);
       // Le client a rempli le formulaire COD mais n'a pas encore payé/confirmé au téléphone.
       // On envoie 'InitiateCheckout' au lieu de 'Purchase' pour ne pas fausser l'algorithme de Meta.

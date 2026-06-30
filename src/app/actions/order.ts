@@ -27,7 +27,7 @@ export async function createOrder(formData: FormData) {
     const honeypot = formData.get("website") as string;
     if (honeypot) {
       // Un bot a rempli le champ caché — on simule un succès pour ne pas alerter
-      return { success: true, orderId: "fake" };
+      return { success: true, isBot: true, orderId: "fake" };
     }
 
     // Validation des champs obligatoires
