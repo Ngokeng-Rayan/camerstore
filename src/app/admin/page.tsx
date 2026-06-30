@@ -13,6 +13,7 @@ export default async function AdminDashboard({
 }) {
   const resolvedParams = await searchParams;
   const period = typeof resolvedParams.period === 'string' ? resolvedParams.period : 'all';
+  const productIdFilter = typeof resolvedParams.productId === 'string' ? resolvedParams.productId : 'all';
 
   let dateFilter = {};
   const today = new Date();
@@ -32,9 +33,18 @@ export default async function AdminDashboard({
     };
   }
 
+  // 0. Tous les produits (pour le filtre dropdown)
+  const allProducts = await prisma.product.findMany({
+    select: { id: true, title: true },
+    orderBy: { title: 'asc' }
+  });
+
   // 1. Récupérer les commandes filtrées pour les KPIs
   const filteredOrders = await prisma.order.findMany({
-    where: period !== 'all' ? { createdAt: dateFilter } : undefined,
+    where: {
+      ...(period !== 'all' ? { createdAt: dateFilter } : {}),
+      ...(productIdFilter !== 'all' ? { productId: productIdFilter } : {})
+    },
     orderBy: { createdAt: 'asc' },
     include: { product: true }
   });
@@ -84,6 +94,41 @@ export default async function AdminDashboard({
       newLeadsCount++;
     }
   });
+
+  // Performance par produit (toutes les commandes livrées de la période groupées par produit)
+  const productStatsMap: Record<string, {
+    title: string;
+    revenue: number;
+    netProfit: number;
+    count: number;
+  }> = {};
+
+  filteredOrders.forEach(order => {
+    if (order.status === "DELIVERED") {
+      const pid = order.productId;
+      if (!productStatsMap[pid]) {
+        productStatsMap[pid] = { title: order.product.title, revenue: 0, netProfit: 0, count: 0 };
+      }
+      productStatsMap[pid].revenue += order.totalPrice;
+      productStatsMap[pid].count += 1;
+
+      const productCost = (order.product?.costPrice || 0) * order.quantity;
+      let deliveryCost = 0;
+      let adCost = 0;
+      try {
+        if (order.deliveryNotes && order.deliveryNotes.trim().startsWith("{")) {
+          const parsed = JSON.parse(order.deliveryNotes);
+          if (parsed.expenses) {
+            deliveryCost = parsed.expenses.deliveryCost || 0;
+            adCost = parsed.expenses.adCost || 0;
+          }
+        }
+      } catch(e) {}
+      productStatsMap[pid].netProfit += (order.totalPrice - productCost - deliveryCost - adCost);
+    }
+  });
+
+  const productStats = Object.values(productStatsMap).sort((a, b) => b.revenue - a.revenue);
 
   // 2. Préparation des données pour le graphe des ventes (7 derniers jours)
   const last7Days = Array.from({ length: 7 }).map((_, i) => {
@@ -139,7 +184,7 @@ export default async function AdminDashboard({
     <div className="p-4 md:p-8 space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-3xl font-bold text-brand-navy">Tableau de bord</h1>
-        <DashboardFilter />
+        <DashboardFilter products={allProducts} />
       </div>
 
       {/* Actions Rapides */}
@@ -198,6 +243,51 @@ export default async function AdminDashboard({
 
       {/* Graphiques Réels (Recharts) */}
       <DashboardCharts salesData={last7Days} statusData={pieData} />
+
+      {/* Performance par Produit */}
+      {productStats.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-brand-navy flex items-center gap-2 mb-4">
+            <Package className="text-brand-green" size={20} />
+            Performance par Produit
+            {productIdFilter !== 'all' && (
+              <span className="text-sm text-slate-400 font-normal ml-1">(filtre actif)</span>
+            )}
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[500px]">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500">
+                  <th className="p-3 font-semibold">Produit</th>
+                  <th className="p-3 font-semibold text-center">Commandes Livrées</th>
+                  <th className="p-3 font-semibold text-right">CA (FCFA)</th>
+                  <th className="p-3 font-semibold text-right">Bénéfice Net (FCFA)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {productStats.map((p, i) => (
+                  <tr key={i} className="hover:bg-slate-50">
+                    <td className="p-3">
+                      <div className="font-semibold text-brand-navy text-sm line-clamp-1">{p.title}</div>
+                    </td>
+                    <td className="p-3 text-center">
+                      <span className="bg-blue-50 text-blue-700 font-bold text-xs px-2 py-1 rounded-full">{p.count}</span>
+                    </td>
+                    <td className="p-3 text-right font-bold text-brand-green text-sm">
+                      {p.revenue.toLocaleString('fr-FR')}
+                    </td>
+                    <td className="p-3 text-right font-bold text-sm">
+                      <span className={p.netProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                        {p.netProfit >= 0 ? '+' : ''}{p.netProfit.toLocaleString('fr-FR')}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Commandes Récentes */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
