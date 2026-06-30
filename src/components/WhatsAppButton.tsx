@@ -1,8 +1,14 @@
 "use client";
 
-export function WhatsAppButton() {
+interface WhatsAppButtonProps {
+  productName?: string;
+}
+
+export function WhatsAppButton({ productName }: WhatsAppButtonProps = {}) {
   const phone = "237695540435"; // Numéro au format international sans le +
-  const message = encodeURIComponent("Bonjour ! Je suis intéressé(e) par vos produits sur CamerStore. Pouvez-vous m'aider ?");
+  const message = productName
+    ? encodeURIComponent(`Bonjour ! Je suis intéressé(e) par le produit "${productName}" sur CamerStore. Pouvez-vous m'aider à commander ?`)
+    : encodeURIComponent("Bonjour ! Je suis intéressé(e) par vos produits sur CamerStore. Pouvez-vous m'aider ?");
   const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
 
   return (

@@ -8,6 +8,7 @@ import Image from "next/image";
 import { FrontNavbar } from "@/components/FrontNavbar";
 import { FrontFooter } from "@/components/FrontFooter";
 import { fbEvent, getFbc } from "@/components/FacebookPixel";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export default function ProductClient({ product, reviews }: { product: any, reviews: any[] }) {
   const router = useRouter();
@@ -619,6 +620,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
       <div className="mt-20">
         <FrontFooter />
+        <WhatsAppButton productName={product.title} />
       </div>
 
       {/* Sticky Bottom Button */}
