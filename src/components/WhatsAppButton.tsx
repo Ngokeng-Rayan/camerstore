@@ -2,21 +2,29 @@
 
 interface WhatsAppButtonProps {
   productName?: string;
+  price?: number;
 }
 
-export function WhatsAppButton({ productName }: WhatsAppButtonProps = {}) {
-  const phone = "237695540435"; // Numéro au format international sans le +
-  const message = productName
-    ? encodeURIComponent(`Bonjour ! Je suis intéressé(e) par le produit "${productName}" sur CamerStore. Pouvez-vous m'aider à commander ?`)
-    : encodeURIComponent("Bonjour ! Je suis intéressé(e) par vos produits sur CamerStore. Pouvez-vous m'aider ?");
-  const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+export function WhatsAppButton({ productName, price }: WhatsAppButtonProps = {}) {
+  const phone = "237695540435";
+  
+  let messageText: string;
+  if (productName && price) {
+    messageText = `Bonjour CamerStore ! 👋\n\nJe souhaite commander le produit suivant :\n\n📦 *${productName}*\n💰 Prix : *${price.toLocaleString('fr-FR')} FCFA*\n\nPouvez-vous m'aider à finaliser ma commande ? Merci !`;
+  } else if (productName) {
+    messageText = `Bonjour CamerStore ! 👋\n\nJe suis intéressé(e) par le produit *${productName}*.\n\nPouvez-vous m'aider à commander ? Merci !`;
+  } else {
+    messageText = `Bonjour CamerStore ! 👋\n\nJe suis intéressé(e) par vos produits. Pouvez-vous m'aider ? Merci !`;
+  }
+  
+  const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(messageText)}`;
 
   return (
     <a
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Discuter sur WhatsApp"
+      aria-label="Commander via WhatsApp"
       className="fixed bottom-6 right-4 z-[999] flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 group"
     >
       {/* Icône WhatsApp SVG */}
@@ -26,9 +34,9 @@ export function WhatsAppButton({ productName }: WhatsAppButtonProps = {}) {
         </svg>
       </div>
 
-      {/* Label visible au hover sur desktop, toujours visible sur mobile */}
+      {/* Label visible au hover sur desktop */}
       <span className="pr-4 text-sm hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity duration-300 max-w-0 group-hover:max-w-xs overflow-hidden whitespace-nowrap">
-        Discuter sur WhatsApp
+        Commander via WhatsApp
       </span>
     </a>
   );

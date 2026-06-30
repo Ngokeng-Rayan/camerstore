@@ -620,7 +620,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
       <div className="mt-20">
         <FrontFooter />
-        <WhatsAppButton productName={product.title} />
+        <WhatsAppButton productName={product.title} price={product.sellingPrice} />
       </div>
 
       {/* Sticky Bottom Button */}
