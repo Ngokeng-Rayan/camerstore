@@ -17,8 +17,10 @@ export default async function AdminDeliveries() {
   });
 
   // Séparer les commandes à planifier et celles déjà planifiées
-  const toPlan = orders.filter(o => o.status === "NEW_LEAD");
-  const planned = orders.filter(o => o.status === "CONFIRMED" || o.status === "OUT_FOR_DELIVERY");
+  // Une commande "CONFIRMED" sans date de livraison retourne dans "À planifier"
+  const toPlan = orders.filter(o => o.status === "NEW_LEAD" || (o.status === "CONFIRMED" && !o.deliveryDate));
+  // Elle passe dans "Planifiées" si elle a une date, ou si elle est en cours de livraison
+  const planned = orders.filter(o => (o.status === "CONFIRMED" && o.deliveryDate) || o.status === "OUT_FOR_DELIVERY");
 
   return (
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto">
