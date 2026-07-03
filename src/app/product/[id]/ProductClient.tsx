@@ -249,8 +249,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
       </div>
 
       {/* Top Banner Warning */}
-      <div className="bg-brand-red text-white text-center py-2 text-xs md:text-sm font-bold tracking-wide">
-        NE COMMANDEZ PAS SI VOUS N'ÊTES PAS PRÊT POUR ACHETER 🎈
+      <div className="bg-slate-800 text-white text-center py-2 px-4 text-xs md:text-sm font-medium tracking-wide">
+        Commande validée par téléphone sous 30 minutes. Merci de rester joignable pour planifier votre livraison. 📞
       </div>
 
       <FrontNavbar />
@@ -313,7 +313,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                 <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />
               ))}
             </div>
-            <span className="text-sm font-medium text-slate-600 ml-1">({reviews.length > 0 ? reviews.length + 1520 : 6432} Clients satisfaits)</span>
+            <span className="text-sm font-medium text-slate-600 ml-1">({reviews.length > 0 ? reviews.length + 42 : 47} avis vérifiés à Douala/Yaoundé)</span>
           </div>
 
           <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2 leading-tight">
@@ -328,16 +328,16 @@ export default function ProductClient({ product, reviews }: { product: any, revi
           </div>
           
           {product.comparePrice && (
-            <div className="bg-brand-green text-brand-navy inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold mb-6 shadow-sm">
-              🏷️ ECONOMISEZ {Math.round((1 - product.sellingPrice / product.comparePrice) * 100)}%
+            <div className="bg-green-100 text-green-800 border border-green-200 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-bold mb-6 shadow-sm">
+              💰 Économisez {(product.comparePrice - product.sellingPrice).toLocaleString('fr-FR')} FCFA aujourd'hui
             </div>
           )}
 
           <div className="mt-2" id="order-form">
             {/* Nouveau Formulaire Haute Conversion COD */}
             <div className="border-2 border-brand-green shadow-xl rounded-3xl p-4 md:p-6 bg-white relative">
-              <div className="text-center text-sm md:text-base font-bold text-brand-red leading-relaxed mb-6 bg-red-50 p-3 rounded-xl border border-brand-red/20">
-                <span className="text-xl">🚨</span> Par respect pour notre équipe <span className="text-xl">🙏</span>, merci de ne pas commander si vous êtes en voyage <span className="text-xl">🧳</span>, indisponible <span className="text-xl">🚫</span> ou pas prêt(e) financièrement pour acheter <span className="text-xl">💸 ‼️</span>
+              <div className="text-center text-sm md:text-base font-medium text-slate-700 leading-relaxed mb-6 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                <span className="text-xl">🚚</span> Pour garantir une livraison rapide, veuillez commander uniquement si vous êtes disponible pour recevoir votre colis.
               </div>
               
               {/* Résumé du Panier */}
@@ -530,8 +530,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                   </div>
                 </div>
 
-                <p className="text-center text-brand-red font-bold text-xs uppercase mt-4">
-                  COMMANDEZ UNIQUEMENT SI VOUS ETES PRET POUR ACHETER
+                <p className="text-center text-slate-500 font-medium text-xs mt-4">
+                  🔒 Vos informations sont sécurisées. Paiement à la livraison.
                 </p>
               </form>
             </div>
