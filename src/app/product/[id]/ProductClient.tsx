@@ -329,8 +329,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
         </div>
 
         {/* Trust Badge */}
-        <div className="mx-4 mt-4 bg-blue-50 border border-blue-100 text-slate-700 p-2 text-center font-bold text-xs md:text-sm tracking-wide rounded-lg flex items-center justify-center gap-2 shadow-sm">
-          🌟 Votre satisfaction est notre priorité absolue
+        <div className="mx-4 mt-4 bg-brand-green/20 border-2 border-brand-green text-brand-navy p-3 text-center font-black text-[13px] md:text-sm tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-md uppercase">
+          🌟 VOTRE SATISFACTION EST NOTRE PRIORITÉ ABSOLUE
         </div>
 
         <div className="p-4 md:p-6">
@@ -364,8 +364,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
           <div className="mt-2" id="order-form">
             {/* Nouveau Formulaire Haute Conversion COD */}
             <div className="border-2 border-brand-green shadow-xl rounded-3xl p-4 md:p-6 bg-white relative">
-              <div className="text-center text-sm md:text-base font-medium text-slate-700 leading-relaxed mb-6 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
-                <span className="text-xl">🚚</span> Pour garantir une livraison rapide, veuillez commander uniquement si vous êtes disponible pour recevoir votre colis.
+              <div className="text-center text-sm md:text-base font-bold text-brand-navy leading-relaxed mb-6 bg-brand-green/10 p-4 rounded-xl border-2 border-brand-green/50 shadow-sm">
+                <span className="text-xl">🚚</span> POUR GARANTIR UNE LIVRAISON RAPIDE, veuillez commander uniquement si vous êtes disponible pour recevoir votre colis.
               </div>
               
               {/* Résumé du Panier */}
@@ -528,7 +528,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                     <div className="bg-slate-100 px-4 flex items-center justify-center border-r border-slate-300 text-slate-500">
                       <MapPin size={18} />
                     </div>
-                    <input name="customerCity" required type="text" placeholder="Exp: Douala, Akwa" className="w-full px-4 py-3 outline-none" />
+                    <input name="customerCity" required type="text" placeholder="Exp: Douala, Makepe BM" className="w-full px-4 py-3 outline-none" />
                   </div>
                   {/* Note: Pour la db, on mappe customerCity à city et on ignore address, ou on garde un input combiné. Dans l'action "createOrder", on gère customerCity et customerAddress. Je vais ajouter un champ caché pour éviter que ça ne crash */}
                   <input type="hidden" name="customerAddress" value="Fourni dans le champ ville/quartier" />
