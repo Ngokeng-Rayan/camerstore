@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { format, isToday, isTomorrow, startOfWeek, addDays, isSameDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import { scheduleDeliveryAction, updateOrderStatusAction } from "@/app/actions/delivery";
-import { CheckCircle, X, Truck, Calendar as CalendarIcon, Clock, Package, Phone } from "lucide-react";
+import { CheckCircle, X, Truck, Calendar as CalendarIcon, Clock, Package, Phone, Edit } from "lucide-react";
 
 export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any[], planned: any[] }) {
   const [filterDay, setFilterDay] = useState<string>("all");
@@ -287,20 +287,57 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                   <div className="text-sm font-medium text-slate-700 flex items-center gap-1">
                     <Package size={14} /> {order.product.title}
                   </div>
-                  <div className="flex items-center gap-2 pt-2">
-                    <button 
-                      onClick={() => handleMarkDelivered(order.id)}
-                      className="flex-1 bg-brand-green/20 hover:bg-brand-green text-brand-navy px-3 py-2 rounded font-bold text-sm flex justify-center items-center gap-1 transition-colors"
-                    >
-                      <CheckCircle size={16} /> Livré
-                    </button>
-                    <button 
-                      onClick={() => handleMarkCancelled(order.id)}
-                      className="bg-red-50 hover:bg-red-500 hover:text-white text-red-600 px-3 py-2 rounded font-bold text-sm flex justify-center items-center gap-1 transition-colors"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
+                  {planningOrderId === order.id ? (
+                    <div className="bg-white p-4 border border-brand-green rounded-lg shadow-sm mt-2">
+                      <h4 className="font-bold text-brand-navy mb-3">Modifier la planification</h4>
+                      <form onSubmit={handleSchedule} className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Date</label>
+                          <input type="date" name="deliveryDate" defaultValue={order.deliveryDate ? format(new Date(order.deliveryDate), 'yyyy-MM-dd') : ""} required className="w-full px-2 py-1.5 border border-slate-300 rounded focus:ring-1 outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Créneau</label>
+                          <select name="deliveryTimeSlot" defaultValue={order.deliveryTimeSlot || ""} required className="w-full px-2 py-1.5 border border-slate-300 rounded focus:ring-1 outline-none">
+                            <option value="">Sélectionner...</option>
+                            <option value="Matin (8h - 12h)">Matin (8h - 12h)</option>
+                            <option value="Après-midi (12h - 16h)">Après-midi (12h - 16h)</option>
+                            <option value="Soir (16h - 19h)">Soir (16h - 19h)</option>
+                            <option value="À préciser">À préciser</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Indications</label>
+                          <textarea name="deliveryNotes" defaultValue={order.deliveryNotes || ""} rows={2} placeholder="Ex: Derrière la station..." className="w-full px-2 py-1.5 border border-slate-300 rounded focus:ring-1 outline-none"></textarea>
+                        </div>
+                        <div className="flex gap-2 justify-end pt-2">
+                          <button type="button" onClick={() => setPlanningOrderId(null)} className="px-3 py-1 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded">Annuler</button>
+                          <button type="submit" disabled={isSubmitting} className="px-3 py-1 text-xs font-bold bg-brand-green text-brand-navy rounded hover:bg-lime-500">Valider</button>
+                        </div>
+                      </form>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 pt-2">
+                      <button 
+                        onClick={() => setPlanningOrderId(order.id)}
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded font-bold text-sm flex items-center justify-center transition-colors"
+                        title="Modifier"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleMarkDelivered(order.id)}
+                        className="flex-1 bg-brand-green/20 hover:bg-brand-green text-brand-navy px-3 py-2 rounded font-bold text-sm flex justify-center items-center gap-1 transition-colors"
+                      >
+                        <CheckCircle size={16} /> Livré
+                      </button>
+                      <button 
+                        onClick={() => handleMarkCancelled(order.id)}
+                        className="bg-red-50 hover:bg-red-500 hover:text-white text-red-600 px-3 py-2 rounded font-bold text-sm flex justify-center items-center gap-1 transition-colors"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -351,20 +388,57 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                         <div className="font-bold text-brand-green">{order.totalPrice.toLocaleString('fr-FR')} FCFA</div>
                       </td>
                       <td className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => handleMarkDelivered(order.id)}
-                            className="bg-brand-green/20 hover:bg-brand-green text-brand-navy px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1 transition-colors"
-                          >
-                            <CheckCircle size={14} /> Livré
-                          </button>
-                          <button 
-                            onClick={() => handleMarkCancelled(order.id)}
-                            className="bg-red-50 hover:bg-red-500 hover:text-white text-red-600 px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1 transition-colors"
-                          >
-                            <X size={14} /> Échec
-                          </button>
-                        </div>
+                        {planningOrderId === order.id ? (
+                          <div className="bg-white p-4 border border-brand-green rounded-lg shadow-xl text-left absolute z-10 w-80 right-8 -mt-4">
+                            <h4 className="font-bold text-brand-navy mb-3">Modifier la planification</h4>
+                            <form onSubmit={handleSchedule} className="space-y-3">
+                              <div>
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">Date</label>
+                                <input type="date" name="deliveryDate" defaultValue={order.deliveryDate ? format(new Date(order.deliveryDate), 'yyyy-MM-dd') : ""} required className="w-full px-2 py-1.5 border border-slate-300 rounded focus:ring-1 outline-none" />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">Créneau</label>
+                                <select name="deliveryTimeSlot" defaultValue={order.deliveryTimeSlot || ""} required className="w-full px-2 py-1.5 border border-slate-300 rounded focus:ring-1 outline-none">
+                                  <option value="">Sélectionner...</option>
+                                  <option value="Matin (8h - 12h)">Matin (8h - 12h)</option>
+                                  <option value="Après-midi (12h - 16h)">Après-midi (12h - 16h)</option>
+                                  <option value="Soir (16h - 19h)">Soir (16h - 19h)</option>
+                                  <option value="À préciser">À préciser</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">Indications livreur</label>
+                                <textarea name="deliveryNotes" defaultValue={order.deliveryNotes || ""} rows={2} placeholder="Ex: Derrière la station..." className="w-full px-2 py-1.5 border border-slate-300 rounded focus:ring-1 outline-none"></textarea>
+                              </div>
+                              <div className="flex gap-2 justify-end pt-2">
+                                <button type="button" onClick={() => setPlanningOrderId(null)} className="px-3 py-1 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded">Annuler</button>
+                                <button type="submit" disabled={isSubmitting} className="px-3 py-1 text-xs font-bold bg-brand-green text-brand-navy rounded hover:bg-lime-500">Valider</button>
+                              </div>
+                            </form>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-end gap-2">
+                            <button 
+                              onClick={() => setPlanningOrderId(order.id)}
+                              className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1.5 rounded flex items-center justify-center transition-colors"
+                              title="Modifier la planification"
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button 
+                              onClick={() => handleMarkDelivered(order.id)}
+                              className="bg-brand-green/20 hover:bg-brand-green text-brand-navy px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1 transition-colors"
+                            >
+                              <CheckCircle size={14} /> Livré
+                            </button>
+                            <button 
+                              onClick={() => handleMarkCancelled(order.id)}
+                              className="bg-red-50 hover:bg-red-500 hover:text-white text-red-600 px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1 transition-colors"
+                            >
+                              <X size={14} /> Échec
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))
