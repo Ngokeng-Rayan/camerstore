@@ -68,8 +68,15 @@ export async function createOrder(formData: FormData) {
       return { success: false, error: "Produit non trouvé." };
     }
 
-    const totalPrice = product.sellingPrice * quantity;
-
+    // Appliquer la même réduction par quantité que sur le frontend
+    let discount = 0;
+    if (quantity >= 3) {
+      discount = 0.35;
+    } else if (quantity >= 2) {
+      discount = 0.20;
+    }
+    const unitPrice = Math.round(product.sellingPrice * (1 - discount));
+    const totalPrice = unitPrice * quantity;
     // 4. Récupérer les données de tracking Meta
     const userAgent = headerStore.get("user-agent") || undefined;
     const cookieStore = await cookies();
