@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useId } from "react";
-import { Star, Truck, ShieldCheck, Clock, ChevronRight, ChevronLeft, User, Phone, MapPin, Minus, Plus, ShoppingBag, MessageCircle } from "lucide-react";
+import { Star, Truck, ShieldCheck, Clock, ChevronRight, ChevronLeft, User, Phone, MapPin, Minus, Plus, ShoppingBag, MessageCircle, X } from "lucide-react";
 import { createOrder } from "@/app/actions/order";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -42,6 +42,28 @@ export default function ProductClient({ product, reviews }: { product: any, revi
   const savings = totalWithoutDiscount - totalPrice;
   const [popupReview, setPopupReview] = useState<{ customerName: string; content: string; rating: number } | null>(null);
 
+  // Swipe to dismiss popup
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const currentX = e.targetTouches[0].clientX;
+    const diff = touchStartX - currentX;
+    
+    if (Math.abs(diff) > 40) {
+      setShowPopup(false);
+      setTouchStartX(null);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setTouchStartX(null);
+  };
+
   useEffect(() => {
     // Countdown Timer
     const timer = setInterval(() => {
@@ -73,18 +95,18 @@ export default function ProductClient({ product, reviews }: { product: any, revi
     const step1Timer = setTimeout(() => {
       showCityPopup("Douala", "À l'instant");
 
-      // Étape 2 : Popups avis clients (5s d'intervalle chacun) après Douala
+      // Étape 2 : Popups avis clients (15s d'intervalle chacun) après Douala
       if (reviews.length > 0) {
         reviews.forEach((review, index) => {
-          const reviewDelay = POPUP_DISPLAY_DURATION + 1000 + (index * 5000); // 1s pause après Douala, puis 5s entre chaque
+          const reviewDelay = POPUP_DISPLAY_DURATION + 1000 + (index * 15000); // 15s d'intervalle
           const reviewTimer = setTimeout(() => {
             showReviewPopup({ customerName: review.customerName, content: review.content, rating: review.rating });
           }, reviewDelay);
           allTimers.push(reviewTimer);
         });
 
-        // Étape 3 : Popups villes aléatoires toutes les 60s, après tous les avis
-        const afterAllReviewsDelay = POPUP_DISPLAY_DURATION + 1000 + (reviews.length * 5000) + 1000;
+        // Étape 3 : Popups villes aléatoires toutes les 30s, après tous les avis
+        const afterAllReviewsDelay = POPUP_DISPLAY_DURATION + 1000 + (reviews.length * 15000) + 1000;
         const startCityLoopTimer = setTimeout(() => {
           const cities = ["Yaoundé", "Bafoussam", "Garoua", "Kribi", "Maroua", "Ngaoundéré", "Bamenda", "Limbe", "Edéa", "Bertoua", "Ebolowa"];
           const times = ["À l'instant", "Il y a 2 minutes", "Il y a 4 minutes", "Il y a 7 minutes", "Il y a 12 minutes"];
@@ -93,12 +115,12 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               cities[Math.floor(Math.random() * cities.length)],
               times[Math.floor(Math.random() * times.length)]
             );
-          }, 60000);
+          }, 30000);
           allTimers.push(cityInterval as unknown as NodeJS.Timeout);
         }, afterAllReviewsDelay);
         allTimers.push(startCityLoopTimer);
       } else {
-        // Pas d'avis → passer directement aux popups villes après 60s
+        // Pas d'avis → passer directement aux popups villes après Douala
         const startCityLoopTimer = setTimeout(() => {
           const cities = ["Yaoundé", "Bafoussam", "Garoua", "Kribi", "Maroua", "Ngaoundéré", "Bamenda", "Limbe", "Edéa", "Bertoua", "Ebolowa"];
           const times = ["À l'instant", "Il y a 2 minutes", "Il y a 4 minutes", "Il y a 7 minutes", "Il y a 12 minutes"];
@@ -107,9 +129,9 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               cities[Math.floor(Math.random() * cities.length)],
               times[Math.floor(Math.random() * times.length)]
             );
-          }, 60000);
+          }, 30000);
           allTimers.push(cityInterval as unknown as NodeJS.Timeout);
-        }, POPUP_DISPLAY_DURATION + 60000); // 60s après Douala
+        }, POPUP_DISPLAY_DURATION + 15000); 
         allTimers.push(startCityLoopTimer);
       }
     }, 3000); // Premier popup après 3 secondes
@@ -217,7 +239,18 @@ export default function ProductClient({ product, reviews }: { product: any, revi
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 font-sans">
       
       {/* Fake Sales / Review Popup */}
-      <div className={`fixed top-24 left-4 right-4 md:left-auto md:right-4 md:max-w-sm bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-[100] transition-all duration-500 flex items-center gap-4 ${showPopup ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none'}`}>
+      <div 
+        className={`fixed top-24 left-4 right-4 md:left-auto md:right-4 md:max-w-sm bg-white p-4 rounded-xl shadow-2xl border border-brand-green/30 z-[100] transition-all duration-500 flex items-center gap-4 cursor-pointer ${showPopup ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none'}`}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <button 
+          onClick={() => setShowPopup(false)} 
+          className="absolute -top-2 -right-2 bg-slate-100 text-slate-500 hover:text-slate-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-slate-200 shadow-md transition-colors z-10"
+        >
+          <X size={14} />
+        </button>
         {popupType === "city" ? (
           <>
             <div className="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 overflow-hidden relative">
@@ -246,11 +279,6 @@ export default function ProductClient({ product, reviews }: { product: any, revi
             </div>
           </>
         ) : null}
-      </div>
-
-      {/* Top Banner Warning */}
-      <div className="bg-slate-800 text-white text-center py-2 px-4 text-xs md:text-sm font-medium tracking-wide">
-        Commande validée par téléphone sous 30 minutes. Merci de rester joignable pour planifier votre livraison. 📞
       </div>
 
       <FrontNavbar />
@@ -300,9 +328,9 @@ export default function ProductClient({ product, reviews }: { product: any, revi
           )}
         </div>
 
-        {/* Scarcity Box (N°1) */}
-        <div className="mx-4 mt-4 border-2 border-brand-red text-brand-red p-2 text-center font-bold text-xs md:text-sm tracking-wider bg-white rounded-lg">
-          LE N°1 EN AFRIQUE FRANCOPHONE | SEULEMENT 5 DISPONIBLES |
+        {/* Trust Badge */}
+        <div className="mx-4 mt-4 bg-blue-50 border border-blue-100 text-slate-700 p-2 text-center font-bold text-xs md:text-sm tracking-wide rounded-lg flex items-center justify-center gap-2 shadow-sm">
+          🌟 Votre satisfaction est notre priorité absolue
         </div>
 
         <div className="p-4 md:p-6">
