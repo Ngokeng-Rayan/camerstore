@@ -71,9 +71,9 @@ export async function createOrder(formData: FormData) {
     // Appliquer la même réduction par quantité que sur le frontend
     let discount = 0;
     if (quantity >= 3) {
-      discount = 0.35;
+      discount = 0.25;
     } else if (quantity >= 2) {
-      discount = 0.20;
+      discount = 0.15;
     }
     const unitPrice = Math.round(product.sellingPrice * (1 - discount));
     const totalPrice = unitPrice * quantity;

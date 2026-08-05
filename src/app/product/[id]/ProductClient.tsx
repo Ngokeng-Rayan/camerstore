@@ -31,8 +31,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
 
   // Réductions par quantité
   const getDiscount = (qty: number) => {
-    if (qty >= 3) return 0.35; // -35%
-    if (qty >= 2) return 0.20; // -20%
+    if (qty >= 3) return 0.25; // -25%
+    if (qty >= 2) return 0.15; // -15%
     return 0;
   };
   const discount = getDiscount(quantity);
@@ -386,8 +386,8 @@ export default function ProductClient({ product, reviews }: { product: any, revi
               <div className="flex flex-col gap-3 mb-6 mt-2">
                 {[
                   { qty: 1, discountStr: null, discountPct: 0, label: "Achetez 1 article" },
-                  { qty: 2, discountStr: "20%", discountPct: 0.20, label: "Achetez 2 articles", badge: "Populaire 🔥", badgeColor: "bg-orange-500" },
-                  { qty: 3, discountStr: "35%", discountPct: 0.35, label: "Achetez 3 articles", badge: "Meilleur Deal 💰", badgeColor: "bg-brand-red" }
+                  { qty: 2, discountStr: "15%", discountPct: 0.15, label: "Achetez 2 articles", badge: "Populaire 🔥", badgeColor: "bg-orange-500" },
+                  { qty: 3, discountStr: "25%", discountPct: 0.25, label: "Achetez 3 articles", badge: "Meilleur Deal 💰", badgeColor: "bg-brand-red" }
                 ].map((option) => {
                   const isSelected = quantity === option.qty || (option.qty === 3 && quantity >= 3);
                   const itemTotalPrice = Math.round(product.sellingPrice * option.qty * (1 - option.discountPct));
@@ -563,6 +563,16 @@ export default function ProductClient({ product, reviews }: { product: any, revi
                 </p>
               </form>
             </div>
+          </div>
+
+          {/* Contact Direct */}
+          <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-center shadow-sm">
+            <p className="text-sm text-slate-600 font-medium mb-1">Besoin d'aide ou de passer commande par téléphone ?</p>
+            <p className="text-xl font-black text-brand-navy flex items-center justify-center gap-2">
+              <Phone className="text-brand-green" size={20} />
+              687 527 629
+            </p>
+            <p className="text-xs text-slate-500 mt-1">Contactez-nous directement, nous sommes à votre écoute !</p>
           </div>
 
           {/* Description en bas du formulaire */}

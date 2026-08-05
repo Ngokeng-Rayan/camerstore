@@ -4,12 +4,13 @@ import { useState } from "react";
 import { loginAction } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, AlertCircle, Package, ArrowLeft } from "lucide-react";
+import { Lock, Mail, AlertCircle, Package, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,11 +75,18 @@ export default function LoginPage() {
               <Lock className="absolute left-3 top-3 text-slate-400" size={20} />
               <input 
                 name="password"
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 required 
-                className="w-full pl-10 pr-4 py-3 bg-white text-slate-900 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-all"
+                className="w-full pl-10 pr-12 py-3 bg-white text-slate-900 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-all"
                 placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
           </div>
 
