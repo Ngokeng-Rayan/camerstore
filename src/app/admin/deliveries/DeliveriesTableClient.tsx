@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react";
 import { format, isToday, isTomorrow, startOfWeek, addDays, isSameDay } from "date-fns";
 import { fr } from "date-fns/locale";
-import { scheduleDeliveryAction, updateOrderStatusAction } from "@/app/actions/delivery";
-import { CheckCircle, X, Truck, Calendar as CalendarIcon, Clock, Package, Phone, Edit } from "lucide-react";
+import { scheduleDeliveryAction, updateOrderStatusAction, deleteOrderAction } from "@/app/actions/delivery";
+import { CheckCircle, X, Truck, Calendar as CalendarIcon, Clock, Package, Phone, Edit, Trash2 } from "lucide-react";
 
 export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any[], planned: any[] }) {
   const [filterDay, setFilterDay] = useState<string>("all");
@@ -55,6 +55,12 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
   const handleMarkCancelled = async (id: string) => {
     if (!confirm("Annuler cette commande ?")) return;
     const res = await updateOrderStatusAction(id, "CANCELLED");
+    if (!res.success) alert(res.error);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Voulez-vous vraiment supprimer cette commande définitivement ?")) return;
+    const res = await deleteOrderAction(id);
     if (!res.success) alert(res.error);
   };
 
@@ -117,12 +123,21 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                         </form>
                       </div>
                     ) : (
-                      <button 
-                        onClick={() => setPlanningOrderId(order.id)}
-                        className="bg-brand-navy w-full justify-center text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 flex items-center gap-2"
-                      >
-                        <CalendarIcon size={16} /> Planifier
-                      </button>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => setPlanningOrderId(order.id)}
+                          className="bg-brand-navy flex-1 justify-center text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 flex items-center gap-2"
+                        >
+                          <CalendarIcon size={16} /> Planifier
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(order.id)}
+                          title="Supprimer la commande"
+                          className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 flex items-center justify-center transition-colors border border-red-200"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -189,12 +204,21 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                             </form>
                           </div>
                         ) : (
-                          <button 
-                            onClick={() => setPlanningOrderId(order.id)}
-                            className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 flex items-center gap-2 ml-auto"
-                          >
-                            <CalendarIcon size={16} /> Planifier
-                          </button>
+                          <div className="flex gap-2 justify-end">
+                            <button 
+                              onClick={() => setPlanningOrderId(order.id)}
+                              className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 flex items-center gap-2"
+                            >
+                              <CalendarIcon size={16} /> Planifier
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(order.id)}
+                              title="Supprimer la commande"
+                              className="bg-red-50 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 flex items-center justify-center transition-colors border border-red-200"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>

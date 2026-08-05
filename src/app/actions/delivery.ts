@@ -100,3 +100,17 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
     return { success: false, error: "Erreur lors de la mise à jour du statut" };
   }
 }
+
+export async function deleteOrderAction(orderId: string) {
+  try {
+    await prisma.order.delete({
+      where: { id: orderId }
+    });
+
+    revalidatePath("/admin/deliveries");
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Erreur lors de la suppression de la commande" };
+  }
+}
