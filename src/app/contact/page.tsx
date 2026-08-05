@@ -48,6 +48,18 @@ export default function ContactPage() {
         </div>
 
         <div className="max-w-2xl mx-auto items-start">
+          {/* Bloc Téléphone */}
+          <div className="bg-brand-green/10 border border-brand-green/30 p-6 rounded-2xl mb-8 text-center shadow-sm">
+            <h2 className="text-lg font-bold text-brand-navy mb-2 flex items-center justify-center gap-2">
+              <Phone className="text-brand-green" size={24} />
+              Appelez-nous directement
+            </h2>
+            <a href="tel:+237687527629" className="text-3xl sm:text-4xl font-black text-brand-navy hover:text-brand-green transition-colors block py-2">
+              687 527 629
+            </a>
+            <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium">Nous sommes disponibles pour prendre votre commande ou répondre à vos questions.</p>
+          </div>
+
           {/* Formulaire de contact */}
           <div className="bg-white p-5 sm:p-8 rounded-2xl shadow-sm border border-slate-100">
             <h2 className="text-2xl font-bold text-brand-navy mb-6">Envoyez-nous un message</h2>

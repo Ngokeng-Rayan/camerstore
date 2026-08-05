@@ -19,21 +19,16 @@ export function FrontNavbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link href="/" className="flex items-center gap-2">
-              <Package className="text-brand-green" size={28} />
+              <Package className="text-brand-green" size={32} />
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-black tracking-widest text-brand-navy uppercase">
+                <span className="text-2xl font-black tracking-widest text-brand-navy uppercase">
                   Camer<span className="text-brand-green">Store</span>
                 </span>
-                <span className="text-[9px] sm:text-[10px] text-slate-500 tracking-[0.2em] uppercase font-bold">
+                <span className="text-[10px] text-slate-500 tracking-[0.2em] uppercase font-bold">
                   Le choix de la qualité
                 </span>
               </div>
             </Link>
-
-            <a href="tel:+237687527629" className="flex items-center gap-1.5 bg-brand-green/15 hover:bg-brand-green/30 px-3 py-1.5 rounded-lg border border-brand-green/30 transition-colors ml-auto md:mr-6 mr-3">
-               <Phone size={16} className="text-brand-green" />
-               <span className="text-brand-navy font-black text-sm md:text-base tracking-tight whitespace-nowrap">687 527 629</span>
-            </a>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex gap-8 items-center">
