@@ -91,7 +91,7 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                   </div>
                   <div className="text-sm text-slate-600 bg-slate-50 p-2 rounded">📍 {order.customerCity}</div>
                   <div className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                    <Package size={14} /> {order.product.title}
+                    <Package size={14} /> <span className="font-bold text-brand-green">{order.quantity}x</span> {order.product.title}
                   </div>
                   <div className="pt-2">
                     {planningOrderId === order.id ? (
@@ -171,7 +171,7 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                       </td>
                       <td className="p-4 text-slate-600">{order.customerCity}</td>
                       <td className="p-4 text-sm font-medium text-slate-700">
-                        <div className="flex items-center gap-1"><Package size={14} /> {order.product.title}</div>
+                        <div className="flex items-center gap-1"><Package size={14} /> <span className="font-bold text-brand-green">{order.quantity}x</span> {order.product.title}</div>
                       </td>
                       <td className="p-4 font-bold text-brand-green">{order.totalPrice.toLocaleString('fr-FR')} FCFA</td>
                       <td className="p-4 text-right">
@@ -308,8 +308,8 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                       {order.deliveryNotes}
                     </div>
                   )}
-                  <div className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                    <Package size={14} /> {order.product.title}
+                  <div className="text-sm font-medium text-slate-700 flex items-center gap-1 mt-1">
+                    <Package size={14} /> <span className="font-bold text-brand-green">{order.quantity}x</span> {order.product.title}
                   </div>
                   {planningOrderId === order.id ? (
                     <div className="bg-white p-4 border border-brand-green rounded-lg shadow-sm mt-2">
@@ -408,7 +408,7 @@ export default function DeliveriesTableClient({ toPlan, planned }: { toPlan: any
                         )}
                       </td>
                       <td className="p-4">
-                        <div className="font-semibold text-slate-800 text-sm">{order.product.title}</div>
+                        <div className="font-semibold text-slate-800 text-sm"><span className="font-bold text-brand-green mr-1">{order.quantity}x</span>{order.product.title}</div>
                         <div className="font-bold text-brand-green">{order.totalPrice.toLocaleString('fr-FR')} FCFA</div>
                       </td>
                       <td className="p-4 text-right">

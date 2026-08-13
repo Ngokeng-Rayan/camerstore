@@ -159,6 +159,7 @@ export default async function AdminDashboard({
   const STATUS_COLORS: Record<string, string> = {
     NEW_LEAD: "#facc15", 
     REFUSED_CALL: "#fb923c", 
+    CALL_BACK_LATER: "#14b8a6",
     CONFIRMED: "#3b82f6", 
     OUT_FOR_DELIVERY: "#a855f7", 
     DELIVERED: "#22c55e", 
@@ -168,6 +169,7 @@ export default async function AdminDashboard({
   const statusLabels: Record<string, string> = {
     NEW_LEAD: "Nouveau Lead",
     REFUSED_CALL: "Refusé au tél.",
+    CALL_BACK_LATER: "À rappeler plus tard",
     CONFIRMED: "Confirmé au tél.",
     OUT_FOR_DELIVERY: "En route",
     DELIVERED: "Livré & Encaissé",
@@ -320,6 +322,7 @@ export default async function AdminDashboard({
                     <div className="text-xs text-slate-500">{order.customerPhone}</div>
                   </td>
                   <td className="p-3 text-sm text-slate-700 truncate max-w-[200px]">
+                    <span className="font-bold text-brand-green mr-1">{order.quantity}x</span>
                     {order.product.title}
                   </td>
                   <td className="p-3 font-bold text-brand-green text-sm">

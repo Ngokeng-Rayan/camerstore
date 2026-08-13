@@ -149,6 +149,7 @@ export default async function OrdersCRM({
             <option value="">Tous les statuts</option>
             <option value="NEW_LEAD">Nouveau Lead</option>
             <option value="REFUSED_CALL">Refusé (Tél)</option>
+            <option value="CALL_BACK_LATER">À rappeler plus tard</option>
             <option value="CONFIRMED">Confirmé au Tél.</option>
             <option value="DELIVERED">Livré</option>
             <option value="CANCELLED">Annulé</option>
@@ -187,7 +188,10 @@ export default async function OrdersCRM({
                     </div>
                   </div>
                 </div>
-                <div className="text-sm font-medium text-slate-800 line-clamp-1">{order.product.title}</div>
+                <div className="text-sm font-medium text-slate-800 line-clamp-1">
+                  <span className="font-bold text-brand-green mr-1">{order.quantity}x</span> 
+                  {order.product.title}
+                </div>
                 <div className="text-sm text-slate-600 bg-slate-50 p-2 rounded">📍 {order.customerCity}, {order.customerAddress}</div>
                 <div className="mt-2">
                   <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
@@ -230,8 +234,9 @@ export default async function OrdersCRM({
                         <span>📍 {order.customerCity}, {order.customerAddress}</span>
                       </div>
                     </td>
-                    <td className="p-4">
-                      <div className="font-medium text-slate-800 line-clamp-1">{order.product.title}</div>
+                    <td className="p-4 text-sm text-slate-700">
+                      <span className="font-bold text-brand-green mr-1">{order.quantity}x</span>
+                      {order.product.title}
                       <div className="text-brand-green font-bold text-sm mt-1">{order.totalPrice.toLocaleString('fr-FR')} FCFA</div>
                     </td>
                     <td className="p-4">

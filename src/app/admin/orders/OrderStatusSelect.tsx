@@ -6,6 +6,7 @@ import { updateOrderStatus } from "@/app/actions/orderStatus";
 const STATUS_COLORS: Record<string, string> = {
   NEW_LEAD: "bg-yellow-100 text-yellow-800 border-yellow-200",
   REFUSED_CALL: "bg-orange-100 text-orange-800 border-orange-200",
+  CALL_BACK_LATER: "bg-teal-100 text-teal-800 border-teal-200",
   CONFIRMED: "bg-blue-100 text-blue-800 border-blue-200",
   OUT_FOR_DELIVERY: "bg-purple-100 text-purple-800 border-purple-200",
   DELIVERED: "bg-green-100 text-green-800 border-green-200",
@@ -32,6 +33,7 @@ export function OrderStatusSelect({ orderId, currentStatus }: { orderId: string,
       >
         <option value="NEW_LEAD">🟡 Nouveau Lead</option>
         <option value="REFUSED_CALL">🟠 Refusé au tél.</option>
+        <option value="CALL_BACK_LATER">🕒 À rappeler plus tard</option>
         <option value="CONFIRMED">🔵 Confirmé au tél.</option>
         <option value="OUT_FOR_DELIVERY">🟣 En cours de livraison</option>
         <option value="DELIVERED">🟢 Livré</option>
