@@ -349,7 +349,7 @@ export default function ProductClient({ product, reviews }: { product: any, revi
           </h2>
           
           <div className="flex items-end gap-3 mb-2 mt-4">
-            <span className="text-2xl md:text-3xl font-extrabold text-slate-900">{product.sellingPrice.toLocaleString('fr-FR')} FCFA</span>
+            <span className="text-3xl md:text-5xl font-black text-brand-red">{product.sellingPrice.toLocaleString('fr-FR')} FCFA</span>
             {product.comparePrice && (
               <span className="text-base text-red-500 line-through mb-1">{product.comparePrice.toLocaleString('fr-FR')} FCFA</span>
             )}
