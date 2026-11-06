@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboard, ShoppingCart, Package, Users, LogOut, Menu, X, MessageSquareHeart, Tags, Truck } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, Users, LogOut, Menu, X, MessageSquareHeart, Tags, Truck, Settings } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -93,6 +93,10 @@ export default function AdminSidebar({ role }: { role: string }) {
               <Link onClick={() => setIsSidebarOpen(false)} href="/admin/users" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
                 <Users size={20} />
                 Équipe
+              </Link>
+              <Link onClick={() => setIsSidebarOpen(false)} href="/admin/settings" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors text-red-300 hover:text-red-200">
+                <Settings size={20} />
+                Paramètres
               </Link>
             </>
           )}
