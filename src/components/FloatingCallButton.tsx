@@ -15,25 +15,26 @@ export function FloatingCallButton() {
   const displayPhone = "687 52 76 29";
 
   return (
-    <aside aria-label="Contact téléphonique direct" className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex items-center group">
+    <aside aria-label="Contact téléphonique direct" className="fixed bottom-20 md:bottom-6 right-3 md:right-5 z-40 flex items-center group">
       <a
         href={`tel:${phoneNumber}`}
-        className="relative flex items-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-3 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-2 border-white/80"
+        className="relative flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 border border-white/90"
         title="Appeler directement"
         aria-label={`Appeler le service client au ${displayPhone}`}
       >
-        {/* Effet d'ondulation / pulsation d'appel */}
-        <span className="absolute -inset-1 rounded-full bg-emerald-500 opacity-40 animate-ping -z-10" />
+        {/* Effet de vibration et d'onde derrière */}
+        <span className="absolute -inset-1 rounded-full bg-emerald-500 opacity-60 animate-ping -z-10" />
+        <span className="absolute -inset-2 rounded-full bg-emerald-400 opacity-30 animate-pulse -z-10" />
 
-        <div className="bg-white text-emerald-600 p-2 rounded-full flex items-center justify-center shrink-0 shadow-inner">
-          <PhoneCall size={18} className="animate-bounce" />
+        <div className="bg-white text-emerald-600 p-1.5 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+          <PhoneCall size={13} className="animate-bounce" />
         </div>
 
-        <div className="flex flex-col text-left pr-1">
-          <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-100 leading-tight">
-            Appelez-nous
+        <div className="flex flex-col text-left pr-0.5">
+          <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-100 leading-none mb-0.5">
+            Appel direct
           </span>
-          <span className="text-sm font-extrabold tracking-wide leading-tight">
+          <span className="text-xs font-black tracking-wide leading-none">
             {displayPhone}
           </span>
         </div>
